@@ -47,12 +47,10 @@ class JweUtil {
       return result;
     }
 
-    Uint8List encodeBigInt(BigInt number) {
-      int needsPaddingByte = 0;
-      int numBytes = (number.bitLength + 7) >> 3;
-      var result = Uint8List(numBytes + needsPaddingByte);
-      for (int i = 0; i < numBytes; i++) {
-        result[numBytes - 1 - i + needsPaddingByte] =
+    Uint8List i2osp(BigInt number, int length) {
+      var result = Uint8List(length);
+      for (int i = 0; i < length; i++) {
+        result[length - 1 - i] =
             (number >> (i * 8)).toUnsigned(8).toInt();
       }
       return result;
@@ -103,14 +101,15 @@ class JweUtil {
     final encryptedKey = decodeBase64Url(b64EncryptedKey);
     final cInt = decodeBigInt(encryptedKey);
     final mInt = cInt.modPow(d, n);
-    final rawPt = encodeBigInt(mInt);
+    final k = (n.bitLength + 7) ~/ 8;
+    final em = i2osp(mInt, k);
 
-    if (rawPt.length != 255) {
-      throw Exception('Decryption failed: unexpected OAEP block length (\${rawPt.length})');
+    if (em[0] != 0) {
+      throw Exception('OAEP decoding error: leading byte is not 0x00');
     }
 
-    final maskedSeed = rawPt.sublist(0, 32);
-    final maskedDB = rawPt.sublist(32);
+    final maskedSeed = em.sublist(1, 33);
+    final maskedDB = em.sublist(33);
 
     final seedMask = mgf1(maskedDB, 0, maskedDB.length, 32);
     final seed = Uint8List(32);

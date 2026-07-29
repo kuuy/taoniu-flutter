@@ -147,6 +147,7 @@ class BinanceSpotWsService {
             if (kDebugMode) {
               print('BinanceSpotWsService JWE decrypt error: $e');
             }
+            return;
           }
         }
         final decoded = jsonDecode(jsonStr);

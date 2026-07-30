@@ -1338,7 +1338,7 @@ class _CandlestickChartPainter extends CustomPainter {
     }
 
     // Interactive Crosshair & Tooltip Badges
-    Kline? activeHeaderKline = klines.last;
+    Kline? activeHeaderKline = klines.isNotEmpty ? klines.last : null;
 
     if (hoverOffset != null && hoverOffset!.dx >= 0 && hoverOffset!.dx <= chartWidth) {
       final hX = hoverOffset!.dx;
@@ -1576,15 +1576,10 @@ class _CandlestickChartPainter extends CustomPainter {
 }
 
 class _ChartViewViewState {
-  double zoomScale;
-  double scrollOffset;
-  double priceZoomScale;
-  double priceScrollOffset;
+  double zoomScale = 1.0;
+  double scrollOffset = 0.0;
+  double priceZoomScale = 1.0;
+  double priceScrollOffset = 0.0;
 
-  _ChartViewViewState({
-    this.zoomScale = 1.0,
-    this.scrollOffset = 0.0,
-    this.priceZoomScale = 1.0,
-    this.priceScrollOffset = 0.0,
-  });
+  _ChartViewViewState();
 }

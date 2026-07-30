@@ -34,6 +34,13 @@ class MainTabPage extends GetView<MainTabController> {
                 width: 1.0,
               ),
             ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black45,
+                blurRadius: 8,
+                offset: Offset(0, -2),
+              ),
+            ],
           ),
           child: BottomNavigationBar(
             currentIndex: controller.currentIndex.value,

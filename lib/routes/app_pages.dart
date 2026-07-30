@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import 'app_routes.dart';
+import '../middleware/auth_middleware.dart';
 import '../ui/splash/splash_page.dart';
 import '../ui/splash/splash_controller.dart';
 import '../ui/account/login_page.dart';
@@ -67,6 +68,7 @@ class AppPages {
       name: AppRoutes.binanceSpotAnalysisTradingsScalping,
       page: () => const AnalysisTradingsScalpingPage(),
       binding: AnalysisTradingsScalpingBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: AppRoutes.binanceSpotIndicators,
@@ -82,26 +84,31 @@ class AppPages {
       name: AppRoutes.binanceSpotOrders,
       page: () => const OrdersPage(),
       binding: OrdersBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: AppRoutes.binanceSpotPlans,
       page: () => const PlansPage(),
       binding: PlansBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: AppRoutes.binanceSpotPositions,
       page: () => const PositionsPage(),
       binding: PositionsBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: AppRoutes.binanceSpotScalping,
       page: () => const ScalpingPage(),
       binding: ScalpingBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: AppRoutes.binanceSpotStrategies,
       page: () => const StrategiesPage(),
       binding: StrategiesBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: AppRoutes.binanceSpotTickersRanking,
@@ -117,11 +124,13 @@ class AppPages {
       name: AppRoutes.binanceSpotTradings,
       page: () => const TradingsPage(),
       binding: TradingsBinding(),
+      middlewares: [AuthMiddleware()],
     ),
     GetPage(
       name: AppRoutes.binanceSpotTradingsScalping,
       page: () => const TradingsScalpingPage(),
       binding: TradingsScalpingBinding(),
+      middlewares: [AuthMiddleware()],
     ),
   ];
 }

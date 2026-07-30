@@ -5,6 +5,15 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:jose/jose.dart';
 
 class JweUtil {
+  /// Checks if a string has the 5-part compact serialization format of JWE
+  static bool isJweCompact(dynamic data) {
+    if (data == null || data is! String) return false;
+    final str = data.trim();
+    if (str.isEmpty) return false;
+    final parts = str.split('.');
+    return parts.length == 5 && parts.every((p) => p.isNotEmpty);
+  }
+
   static Future<String> encrypt(String payload) async {
     final publicKeyPem = dotenv.env['JWE_RSA_PUBLIC'];
     if (publicKeyPem == null || publicKeyPem.isEmpty) {

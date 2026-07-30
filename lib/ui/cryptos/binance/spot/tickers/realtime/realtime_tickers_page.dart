@@ -115,7 +115,6 @@ class RealtimeTickersPage extends GetView<RealtimeTickersController> {
         icon = Icons.error;
         break;
       case WsConnectionStatus.disconnected:
-      default:
         bg = TvTableTheme.tvTextSecondary;
         label = '已断开';
         icon = Icons.offline_bolt;

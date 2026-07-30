@@ -21,6 +21,24 @@ class Scalping {
     required this.status,
   });
 
+  bool get isBuy => side == 1;
+  String get sideLabel => isBuy ? 'BUY' : 'SELL';
+
+  String get statusLabel {
+    switch (status) {
+      case 0:
+        return 'PENDING';
+      case 1:
+        return 'RUNNING';
+      case 2:
+        return 'FILLED';
+      case 3:
+        return 'CANCELLED';
+      default:
+        return 'UNKNOWN';
+    }
+  }
+
   factory Scalping.fromJson(Map<String, dynamic> json) {
     return Scalping(
       id: json['id']?.toString() ?? '',

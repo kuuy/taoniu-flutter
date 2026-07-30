@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../components/tables/tradingview_table_theme.dart';
+import '../components/pulsing_badge.dart';
+import '../components/animated_module_card.dart';
 import '../../routes/app_routes.dart';
 import 'home_controller.dart';
 
@@ -15,7 +17,7 @@ class HomePage extends GetView<HomeController> {
         title: 'Taoniu Quant Dashboard',
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none, color: TvTableTheme.tvTextPrimary, size: 22),
+            icon: const Icon(Icons.notifications_none_rounded, color: TvTableTheme.tvTextPrimary, size: 22),
             onPressed: () {
               Get.snackbar(
                 '系统通知',
@@ -23,6 +25,8 @@ class HomePage extends GetView<HomeController> {
                 snackPosition: SnackPosition.TOP,
                 backgroundColor: TvTableTheme.tvHeaderBg,
                 colorText: Colors.white,
+                margin: const EdgeInsets.all(12),
+                borderRadius: 10,
               );
             },
           ),
@@ -35,18 +39,42 @@ class HomePage extends GetView<HomeController> {
           children: [
             // 1. Dashboard Overview Banner
             _buildDashboardBanner(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 22),
 
             // 2. Section Title: Modules Grid
-            const Text(
-              'Binance Spot 功能大厅',
-              style: TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 16, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Row(
+                  children: [
+                    Icon(Icons.widgets_outlined, color: TvTableTheme.tvBlue, size: 18),
+                    SizedBox(width: 8),
+                    Text(
+                      'Binance Spot 功能大厅',
+                      style: TextStyle(
+                        color: TvTableTheme.tvTextPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  '10 Modules',
+                  style: TextStyle(
+                    color: TvTableTheme.tvTextSecondary.withValues(alpha: 0.7),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
 
-            // 3. Grid of Quant Modules
+            // 3. Grid of Quant Modules with Micro-Animations
             _buildModulesGrid(),
-            const SizedBox(height: 20),
+            const SizedBox(height: 22),
 
             // 4. Live Strategy Signals Activity Feed
             _buildSignalsActivityCard(),
@@ -59,15 +87,18 @@ class HomePage extends GetView<HomeController> {
 
   Widget _buildDashboardBanner() {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(18.0),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E222D), Color(0xFF181C27)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: TvTableTheme.tvBorderColor),
+        gradient: TvTableTheme.tvBannerGradient,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: TvTableTheme.tvBorderColor, width: 1.0),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black38,
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,34 +108,27 @@ class HomePage extends GetView<HomeController> {
             children: [
               const Row(
                 children: [
-                  Icon(Icons.bolt, color: Colors.amber, size: 20),
+                  Icon(Icons.bolt_rounded, color: Colors.amber, size: 22),
                   SizedBox(width: 6),
                   Text(
                     '币安现货高频量化中枢',
-                    style: TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 15, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: TvTableTheme.tvTextPrimary,
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.3,
+                    ),
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: TvTableTheme.tvGreen.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  children: [
-                    CircleAvatar(radius: 3, backgroundColor: TvTableTheme.tvGreen),
-                    SizedBox(width: 4),
-                    Text(
-                      '实盘运行中',
-                      style: TextStyle(color: TvTableTheme.tvGreen, fontSize: 11, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
+              const PulsingBadge(
+                label: '实盘运行中',
+                color: TvTableTheme.tvGreen,
+                isLive: true,
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -122,11 +146,18 @@ class HomePage extends GetView<HomeController> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 11)),
-        const SizedBox(height: 2),
+        Text(
+          label,
+          style: const TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 11),
+        ),
+        const SizedBox(height: 3),
         Text(
           value,
-          style: const TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 12, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: TvTableTheme.tvTextPrimary,
+            fontSize: 12.5,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     );
@@ -137,70 +168,70 @@ class HomePage extends GetView<HomeController> {
       {
         'title': 'Spot Tradings',
         'subtitle': 'TradingView 交互 K线与指标',
-        'icon': Icons.candlestick_chart,
+        'icon': Icons.candlestick_chart_rounded,
         'color': TvTableTheme.tvBlue,
         'route': AppRoutes.binanceSpotTradings,
       },
       {
         'title': 'Tradings Scalping',
         'subtitle': '剥头皮高频策略执行',
-        'icon': Icons.trending_up,
+        'icon': Icons.trending_up_rounded,
         'color': TvTableTheme.tvGreen,
         'route': AppRoutes.binanceSpotTradingsScalping,
       },
       {
         'title': 'Scalping Analysis',
         'subtitle': '高频剥头皮收益与胜率统计',
-        'icon': Icons.analytics,
+        'icon': Icons.analytics_rounded,
         'color': Colors.amber,
         'route': AppRoutes.binanceSpotAnalysisTradingsScalping,
       },
       {
         'title': 'Strategies',
         'subtitle': '策略信号分布与绩效',
-        'icon': Icons.alt_route,
-        'color': Colors.purpleAccent,
+        'icon': Icons.alt_route_rounded,
+        'color': TvTableTheme.tvPurple,
         'route': AppRoutes.binanceSpotStrategies,
       },
       {
         'title': 'Indicators Ranking',
         'subtitle': '技术指标量化排行榜',
-        'icon': Icons.bar_chart,
-        'color': Colors.tealAccent,
+        'icon': Icons.bar_chart_rounded,
+        'color': TvTableTheme.tvCyan,
         'route': AppRoutes.binanceSpotIndicatorsRanking,
       },
       {
         'title': 'Tickers Ranking',
         'subtitle': '全网币种异动与排行榜',
-        'icon': Icons.show_chart,
+        'icon': Icons.show_chart_rounded,
         'color': Colors.orangeAccent,
         'route': AppRoutes.binanceSpotTickersRanking,
       },
       {
         'title': 'Realtime Tickers',
         'subtitle': 'WebSocket 实时行情推送与信号',
-        'icon': Icons.online_prediction,
+        'icon': Icons.online_prediction_rounded,
         'color': Colors.lightGreenAccent,
         'route': AppRoutes.binanceSpotTickersRealtime,
       },
       {
         'title': 'Positions',
         'subtitle': '持仓明细与仓位风险监控',
-        'icon': Icons.account_balance_wallet,
+        'icon': Icons.account_balance_wallet_rounded,
         'color': Colors.indigoAccent,
         'route': AppRoutes.binanceSpotPositions,
       },
       {
         'title': 'Orders',
         'subtitle': '活动挂单与历史成交明细',
-        'icon': Icons.list_alt,
+        'icon': Icons.list_alt_rounded,
         'color': Colors.cyanAccent,
         'route': AppRoutes.binanceSpotOrders,
       },
       {
         'title': 'Plans',
         'subtitle': '自动化交易/建仓计划',
-        'icon': Icons.next_plan,
+        'icon': Icons.next_plan_rounded,
         'color': Colors.deepOrangeAccent,
         'route': AppRoutes.binanceSpotPlans,
       },
@@ -211,76 +242,19 @@ class HomePage extends GetView<HomeController> {
       physics: const NeverScrollableScrollPhysics(),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 1.6,
+        childAspectRatio: 1.55,
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
       ),
       itemCount: modules.length,
       itemBuilder: (context, index) {
         final item = modules[index];
-        final color = item['color'] as Color;
-        final icon = item['icon'] as IconData;
-        final route = item['route'] as String;
-
-        return Card(
-          color: TvTableTheme.tvHeaderBg,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: TvTableTheme.tvBorderColor),
-          ),
-          child: InkWell(
-            borderRadius: BorderRadius.circular(12),
-            onTap: () => Get.toNamed(route),
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: color.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(icon, color: color, size: 20),
-                      ),
-                      const Icon(Icons.arrow_forward_ios, color: TvTableTheme.tvTextSecondary, size: 12),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item['title'] as String,
-                        style: const TextStyle(
-                          color: TvTableTheme.tvTextPrimary,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        item['subtitle'] as String,
-                        style: const TextStyle(
-                          color: TvTableTheme.tvTextSecondary,
-                          fontSize: 10,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
+        return AnimatedModuleCard(
+          title: item['title'] as String,
+          subtitle: item['subtitle'] as String,
+          icon: item['icon'] as IconData,
+          accentColor: item['color'] as Color,
+          onTap: () => Get.toNamed(item['route'] as String),
         );
       },
     );
@@ -291,8 +265,15 @@ class HomePage extends GetView<HomeController> {
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: TvTableTheme.tvHeaderBg,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: TvTableTheme.tvBorderColor),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 6,
+            offset: Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,25 +283,32 @@ class HomePage extends GetView<HomeController> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.sensors, color: TvTableTheme.tvGreen, size: 18),
+                  Icon(Icons.sensors_rounded, color: TvTableTheme.tvGreen, size: 18),
                   SizedBox(width: 8),
                   Text(
                     '实时策略信号流',
-                    style: TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 14, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: TvTableTheme.tvTextPrimary,
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.2,
+                    ),
                   ),
                 ],
               ),
-              Text(
-                'Live',
-                style: TextStyle(color: TvTableTheme.tvGreen, fontSize: 11, fontWeight: FontWeight.bold),
+              PulsingBadge(
+                label: 'LIVE',
+                color: TvTableTheme.tvGreen,
+                isLive: true,
+                padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 14),
           _buildSignalItem('BUY', 'BTCUSDT', '\$64,250.80', '1分钟前', TvTableTheme.tvGreen),
-          const Divider(height: 16, color: TvTableTheme.tvBorderColor),
+          const Divider(height: 18, color: TvTableTheme.tvBorderColor, thickness: 0.8),
           _buildSignalItem('SELL', 'ETHUSDT', '\$3,485.00', '5分钟前', TvTableTheme.tvRed),
-          const Divider(height: 16, color: TvTableTheme.tvBorderColor),
+          const Divider(height: 18, color: TvTableTheme.tvBorderColor, thickness: 0.8),
           _buildSignalItem('BUY', 'SOLUSDT', '\$144.90', '12分钟前', TvTableTheme.tvGreen),
         ],
       ),
@@ -333,26 +321,39 @@ class HomePage extends GetView<HomeController> {
       children: [
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text(
-                type,
-                style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
+            PulsingBadge(
+              label: type,
+              color: color,
+              isLive: true,
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              symbol,
+              style: const TextStyle(
+                color: TvTableTheme.tvTextPrimary,
+                fontSize: 13.5,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(width: 8),
-            Text(symbol, style: const TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 13, fontWeight: FontWeight.bold)),
           ],
         ),
         Row(
           children: [
-            Text(price, style: const TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 13, fontWeight: FontWeight.w500)),
+            Text(
+              price,
+              style: const TextStyle(
+                color: TvTableTheme.tvTextPrimary,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                fontFeatures: [FontFeature.tabularFigures()],
+              ),
+            ),
             const SizedBox(width: 12),
-            Text(time, style: const TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 11)),
+            Text(
+              time,
+              style: const TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 11),
+            ),
           ],
         ),
       ],

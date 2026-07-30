@@ -4,16 +4,32 @@ import '../../main_tab/main_tab_controller.dart';
 import '../../../../routes/app_routes.dart';
 
 class TvTableTheme {
-  static const Color tvCanvasBg = Color(0xFF131722);
-  static const Color tvHeaderBg = Color(0xFF1E222D);
-  static const Color tvRowAltBg = Color(0xFF181C27);
-  static const Color tvBorderColor = Color(0xFF2A2E39);
-  static const Color tvTextHeader = Color(0xFF90939E);
+  static const Color tvCanvasBg = Color(0xFF0E111A);
+  static const Color tvHeaderBg = Color(0xFF161B26);
+  static const Color tvCardBg = Color(0xFF1B202E);
+  static const Color tvRowAltBg = Color(0xFF121622);
+  static const Color tvBorderColor = Color(0xFF242A38);
+  static const Color tvTextHeader = Color(0xFF8E95A5);
   static const Color tvTextPrimary = Color(0xFFF0F3FA);
-  static const Color tvTextSecondary = Color(0xFFB2B5BE);
-  static const Color tvGreen = Color(0xFF089981);
-  static const Color tvRed = Color(0xFFF23645);
-  static const Color tvBlue = Color(0xFF2962FF);
+  static const Color tvTextSecondary = Color(0xFFA0A7B5);
+  static const Color tvGreen = Color(0xFF00E676);
+  static const Color tvRed = Color(0xFFFF5252);
+  static const Color tvBlue = Color(0xFF3D78FF);
+  static const Color tvPurple = Color(0xFFB388FF);
+  static const Color tvAmber = Color(0xFFFFB300);
+  static const Color tvCyan = Color(0xFF00E5FF);
+
+  static const LinearGradient tvCardGradient = LinearGradient(
+    colors: [Color(0xFF1C2230), Color(0xFF141824)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient tvBannerGradient = LinearGradient(
+    colors: [Color(0xFF1E2638), Color(0xFF121622)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   static const TextStyle headerTextStyle = TextStyle(
     color: tvTextHeader,

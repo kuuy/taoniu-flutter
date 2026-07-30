@@ -38,10 +38,17 @@ class TokenRefreshService {
 
       final response = await _jwtApi.refresh();
       if (response.statusCode == 200 && response.data != null) {
-        final decryptedString = await JweUtil.decrypt(response.data.toString());
-        final jsonData = jsonDecode(decryptedString);
+        dynamic jsonData = response.data;
+        if (jsonData is String) {
+          final str = jsonData.trim();
+          if (JweUtil.isJweCompact(str)) {
+            jsonData = jsonDecode(await JweUtil.decrypt(str));
+          } else if (str.isNotEmpty) {
+            jsonData = jsonDecode(str);
+          }
+        }
 
-        if (jsonData['success'] == true && jsonData['data'] != null) {
+        if (jsonData is Map && jsonData['success'] == true && jsonData['data'] != null) {
           final dataMap = jsonData['data'];
           if (dataMap['access_token'] != null) {
             await prefs.setString('ACCESS_TOKEN', dataMap['access_token']);

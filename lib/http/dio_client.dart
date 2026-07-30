@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
+import 'jwe_interceptor.dart';
+
 class DioClient {
   static final DioClient _instance = DioClient._internal();
   late Dio dio;
@@ -16,13 +18,16 @@ class DioClient {
       receiveTimeout: const Duration(seconds: 15),
       sendTimeout: const Duration(seconds: 15),
       contentType: 'application/json; charset=utf-8',
-      responseType: ResponseType.json,
+      responseType: ResponseType.plain,
       headers: {
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36',
         'sec-ch-ua-platform': '"Linux"',
         'Accept': 'application/json',
       },
     ));
+
+    // Transparently decrypt JWE compact string responses
+    dio.interceptors.add(JweInterceptor());
 
     if (kDebugMode) {
       dio.interceptors.add(PrettyDioLogger(

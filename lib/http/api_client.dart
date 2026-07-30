@@ -59,15 +59,23 @@ class ApiClient {
     }
   }
 
-  /// Parses JWE encrypted response into `Map<String, dynamic>`
+  /// Parses JWE encrypted response or already decrypted JSON into `Map<String, dynamic>`
   static Future<Map<String, dynamic>> _parseAndDecryptResponse(dynamic rawData) async {
-    if (rawData == null || rawData.toString().isEmpty) {
+    if (rawData == null) {
       throw DecryptException('服务器返回空响应');
     }
 
+    if (rawData is Map<String, dynamic>) {
+      return rawData;
+    }
+
     try {
-      final jweCompact = rawData.toString();
-      final payload = await JweUtil.decrypt(jweCompact);
+      final str = rawData.toString().trim();
+      if (str.isEmpty) throw DecryptException('服务器返回空响应');
+
+      final String payload = JweUtil.isJweCompact(str)
+          ? await JweUtil.decrypt(str)
+          : str;
       final jsonMap = jsonDecode(payload);
 
       if (jsonMap is! Map<String, dynamic>) {
@@ -77,7 +85,7 @@ class ApiClient {
       return jsonMap;
     } catch (e) {
       if (e is ApiException) rethrow;
-      throw DecryptException('JWE 解密失败: $e', null, e);
+      throw DecryptException('数据解析失败: $e', null, e);
     }
   }
 
@@ -98,8 +106,14 @@ class ApiClient {
       try {
         final jwtApi = JwtApi();
         final refreshResponse = await jwtApi.refresh();
-        final decryptedString = await JweUtil.decrypt(refreshResponse.data.toString());
-        final jsonData = jsonDecode(decryptedString);
+        final dynamic rawData = refreshResponse.data;
+        final Map<String, dynamic> jsonData = (rawData is Map<String, dynamic>)
+            ? rawData
+            : (rawData is String && JweUtil.isJweCompact(rawData))
+                ? jsonDecode(await JweUtil.decrypt(rawData))
+                : (rawData is String && rawData.isNotEmpty)
+                    ? jsonDecode(rawData)
+                    : {};
 
         if (jsonData['success'] == true && jsonData['data'] != null) {
           final dataMap = jsonData['data'];
@@ -125,9 +139,13 @@ class ApiClient {
 
     // Try to extract backend error payload if present in response
     if (e.response?.data != null) {
+      final rawErrData = e.response!.data;
+      if (rawErrData is Map<String, dynamic>) {
+        return rawErrData;
+      }
       try {
-        final jweCompact = e.response!.data.toString();
-        final payload = await JweUtil.decrypt(jweCompact);
+        final str = rawErrData.toString().trim();
+        final payload = JweUtil.isJweCompact(str) ? await JweUtil.decrypt(str) : str;
         final jsonMap = jsonDecode(payload);
         if (jsonMap is Map<String, dynamic>) {
           return jsonMap;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:taoniu/routes/app_routes.dart';
 import 'package:taoniu/ui/components/tables/tradingview_table_theme.dart';
 import 'positions_controller.dart';
 
@@ -10,7 +11,22 @@ class PositionsPage extends GetView<PositionsController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: TvTableTheme.tvCanvasBg,
-      appBar: TvTableTheme.buildAppBar(title: 'Positions'),
+      appBar: TvTableTheme.buildAppBar(
+        title: 'Positions',
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.calculate_rounded, color: TvTableTheme.tvCyan, size: 20),
+            tooltip: 'Gambling Calc',
+            onPressed: () => Get.toNamed(AppRoutes.binanceSpotGamblingCalc),
+          ),
+          IconButton(
+            icon: const Icon(Icons.exposure_rounded, color: TvTableTheme.tvBlue, size: 20),
+            tooltip: 'Positions Calc',
+            onPressed: () => Get.toNamed(AppRoutes.binanceSpotPositionsCalc),
+          ),
+        ],
+      ),
+
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(

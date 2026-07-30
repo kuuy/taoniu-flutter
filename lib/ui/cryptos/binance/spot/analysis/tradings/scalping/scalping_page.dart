@@ -11,9 +11,9 @@ class AnalysisTradingsScalpingPage extends GetView<AnalysisTradingsScalpingContr
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: TvTableTheme.tvCanvasBg,
-      appBar: TvTableTheme.buildAppBar(title: 'Analysis Tradings Scalping'),
+      appBar: TvTableTheme.buildAppBar(title: '刷单交易分析'),
       body: Obx(() {
-        if (controller.isLoading.value) {
+        if (controller.isLoading.value && controller.scalpingList.isEmpty) {
           return const Center(
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(TvTableTheme.tvGreen),
@@ -22,29 +22,82 @@ class AnalysisTradingsScalpingPage extends GetView<AnalysisTradingsScalpingContr
         }
 
         if (controller.scalpingList.isEmpty) {
-          return const Center(
-            child: Text(
-              'No listings available',
-              style: TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 14),
+          return RefreshIndicator(
+            onRefresh: controller.fetchListings,
+            color: TvTableTheme.tvGreen,
+            backgroundColor: TvTableTheme.tvHeaderBg,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.7,
+                alignment: Alignment.center,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.analytics_outlined,
+                      size: 48,
+                      color: TvTableTheme.tvTextSecondary,
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      '暂无刷单分析数据',
+                      style: TextStyle(
+                        color: TvTableTheme.tvTextSecondary,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: controller.fetchListings,
+                      icon: const Icon(Icons.refresh, size: 16),
+                      label: const Text('重新加载'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: TvTableTheme.tvHeaderBg,
+                        foregroundColor: TvTableTheme.tvTextPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           );
         }
 
-        return ListView.builder(
-          itemCount: controller.scalpingList.length + 1,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return ScalpingChart(items: controller.scalpingList);
-            }
-            final item = controller.scalpingList[index - 1];
-            return _buildScalpingListItem(item);
-          },
+        return RefreshIndicator(
+          onRefresh: controller.fetchListings,
+          color: TvTableTheme.tvGreen,
+          backgroundColor: TvTableTheme.tvHeaderBg,
+          child: ListView.builder(
+            physics: const AlwaysScrollableScrollPhysics(),
+            itemCount: controller.scalpingList.length + 1,
+            itemBuilder: (context, index) {
+              if (index == 0) {
+                return ScalpingChart(items: controller.scalpingList);
+              }
+              final item = controller.scalpingList[index - 1];
+              return _buildScalpingListItem(item);
+            },
+          ),
         );
       }),
     );
   }
 
   Widget _buildScalpingListItem(Scalping item) {
+    final double profitVal = double.tryParse(item.profit) ?? 0.0;
+    final double addProfitVal = double.tryParse(item.additiveProfit) ?? 0.0;
+
+    final profitColor = profitVal > 0
+        ? TvTableTheme.tvGreen
+        : (profitVal < 0 ? TvTableTheme.tvRed : TvTableTheme.tvTextPrimary);
+    final profitPrefix = profitVal > 0 ? '+' : '';
+
+    final addProfitColor = addProfitVal > 0
+        ? TvTableTheme.tvGreen
+        : (addProfitVal < 0 ? TvTableTheme.tvRed : TvTableTheme.tvTextPrimary);
+    final addProfitPrefix = addProfitVal > 0 ? '+' : '';
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
       decoration: const BoxDecoration(
@@ -68,6 +121,7 @@ class AnalysisTradingsScalpingPage extends GetView<AnalysisTradingsScalpingContr
           Row(
             children: [
               Expanded(
+                flex: 3,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -82,7 +136,7 @@ class AnalysisTradingsScalpingPage extends GetView<AnalysisTradingsScalpingContr
                     Text(
                       '${item.buysCount}',
                       style: const TextStyle(
-                        color: TvTableTheme.tvTextPrimary,
+                        color: TvTableTheme.tvGreen,
                         fontSize: 15.0,
                         fontWeight: FontWeight.w600,
                       ),
@@ -99,7 +153,7 @@ class AnalysisTradingsScalpingPage extends GetView<AnalysisTradingsScalpingContr
                     Text(
                       '${item.sellsCount}',
                       style: const TextStyle(
-                        color: TvTableTheme.tvTextPrimary,
+                        color: TvTableTheme.tvRed,
                         fontSize: 15.0,
                         fontWeight: FontWeight.w600,
                       ),
@@ -108,6 +162,7 @@ class AnalysisTradingsScalpingPage extends GetView<AnalysisTradingsScalpingContr
                 ),
               ),
               Expanded(
+                flex: 4,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -122,7 +177,7 @@ class AnalysisTradingsScalpingPage extends GetView<AnalysisTradingsScalpingContr
                     Text(
                       item.buysAmount,
                       style: const TextStyle(
-                        color: TvTableTheme.tvTextPrimary,
+                        color: TvTableTheme.tvGreen,
                         fontSize: 15.0,
                         fontWeight: FontWeight.w600,
                       ),
@@ -139,7 +194,48 @@ class AnalysisTradingsScalpingPage extends GetView<AnalysisTradingsScalpingContr
                     Text(
                       item.sellsAmount,
                       style: const TextStyle(
-                        color: TvTableTheme.tvTextPrimary,
+                        color: TvTableTheme.tvRed,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      '当日收益',
+                      style: TextStyle(
+                        color: TvTableTheme.tvTextSecondary,
+                        fontSize: 12.0,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$profitPrefix${item.profit}',
+                      style: TextStyle(
+                        color: profitColor,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      '累计收益',
+                      style: TextStyle(
+                        color: TvTableTheme.tvTextSecondary,
+                        fontSize: 12.0,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '$addProfitPrefix${item.additiveProfit}',
+                      style: TextStyle(
+                        color: addProfitColor,
                         fontSize: 15.0,
                         fontWeight: FontWeight.w600,
                       ),
@@ -164,7 +260,8 @@ class ScalpingChart extends StatelessWidget {
   Widget build(BuildContext context) {
     if (items.isEmpty) return const SizedBox.shrink();
 
-    final chartItems = items.length > 10 ? items.sublist(0, 10) : items;
+    final rawItems = items.length > 10 ? items.sublist(0, 10) : items;
+    final chartItems = rawItems.reversed.toList();
 
     int maxVal = 0;
     for (var item in chartItems) {
@@ -181,7 +278,7 @@ class ScalpingChart extends StatelessWidget {
     }
 
     return Container(
-      height: 210,
+      height: 220,
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
       decoration: const BoxDecoration(
         color: TvTableTheme.tvCanvasBg,
@@ -189,44 +286,16 @@ class ScalpingChart extends StatelessWidget {
           bottom: BorderSide(color: TvTableTheme.tvBorderColor, width: 1.0),
         ),
       ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 32,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$maxVal',
-                  style: const TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 10),
-                ),
-                Text(
-                  '${maxVal ~/ 2}',
-                  style: const TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 10),
-                ),
-                const Text(
-                  '0',
-                  style: TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 10),
-                ),
-                const SizedBox(height: 18),
-              ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return CustomPaint(
+            size: Size(constraints.maxWidth, constraints.maxHeight),
+            painter: ScalpingChartPainter(
+              items: chartItems,
+              maxVal: maxVal,
             ),
-          ),
-          Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return CustomPaint(
-                  size: Size(constraints.maxWidth, constraints.maxHeight),
-                  painter: ScalpingChartPainter(
-                    items: chartItems,
-                    maxVal: maxVal,
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -246,55 +315,95 @@ class ScalpingChartPainter extends CustomPainter {
     if (items.isEmpty) return;
 
     const double xAxisHeight = 22.0;
+    const double leftPadding = 32.0;
+    final double chartWidth = size.width - leftPadding;
     final double chartHeight = size.height - xAxisHeight;
     final double baselineY = chartHeight / 2.0;
 
     final gridPaint = Paint()
-      ..color = const Color(0xFF2A2E39)
+      ..color = TvTableTheme.tvBorderColor
       ..strokeWidth = 0.8;
 
     final baselinePaint = Paint()
       ..color = const Color(0xFF434651)
       ..strokeWidth = 1.0;
 
-    final greenPaint = Paint()..color = const Color(0xFF66BB6A);
-    final redPaint = Paint()..color = const Color(0xFFEF5350);
+    final greenPaint = Paint()..color = TvTableTheme.tvGreen;
+    final redPaint = Paint()..color = TvTableTheme.tvRed;
 
-    // Grid lines
-    canvas.drawLine(const Offset(0, 0), Offset(size.width, 0), gridPaint);
-    canvas.drawLine(Offset(0, baselineY / 2), Offset(size.width, baselineY / 2), gridPaint);
-    canvas.drawLine(Offset(0, baselineY), Offset(size.width, baselineY), baselinePaint);
-    canvas.drawLine(Offset(0, baselineY + baselineY / 2), Offset(size.width, baselineY + baselineY / 2), gridPaint);
-    canvas.drawLine(Offset(0, chartHeight), Offset(size.width, chartHeight), gridPaint);
+    final yPositions = [
+      0.0,
+      baselineY / 2,
+      baselineY,
+      baselineY + baselineY / 2,
+      chartHeight,
+    ];
+
+    final yLabels = [
+      '$maxVal',
+      '${maxVal ~/ 2}',
+      '0',
+      '${maxVal ~/ 2}',
+      '$maxVal',
+    ];
+
+    for (int i = 0; i < yPositions.length; i++) {
+      final y = yPositions[i];
+      final paintStyle = (i == 2) ? baselinePaint : gridPaint;
+      canvas.drawLine(Offset(leftPadding, y), Offset(size.width, y), paintStyle);
+
+      final textSpan = TextSpan(
+        text: yLabels[i],
+        style: TextStyle(
+          color: i == 2 ? TvTableTheme.tvTextPrimary : TvTableTheme.tvTextSecondary,
+          fontSize: 9.5,
+          fontWeight: i == 2 ? FontWeight.bold : FontWeight.normal,
+        ),
+      );
+      final textPainter = TextPainter(
+        text: textSpan,
+        textDirection: TextDirection.ltr,
+      );
+      textPainter.layout();
+
+      double labelY = y - textPainter.height / 2;
+      if (i == 0) labelY = y;
+      if (i == yPositions.length - 1) labelY = y - textPainter.height;
+
+      textPainter.paint(canvas, Offset(0, labelY));
+    }
 
     final int count = items.length;
-    final double slotWidth = size.width / count;
-    final double barWidth = (slotWidth * 0.65).clamp(8.0, 36.0);
+    final double slotWidth = chartWidth / count;
+    final double barWidth = (slotWidth * 0.60).clamp(6.0, 32.0);
     final double maxBarHeight = baselineY - 4.0;
 
     for (int i = 0; i < count; i++) {
       final item = items[i];
-      final double centerX = slotWidth * i + slotWidth / 2.0;
+      final double centerX = leftPadding + slotWidth * i + slotWidth / 2.0;
       final double barLeft = centerX - barWidth / 2.0;
       final double barRight = centerX + barWidth / 2.0;
 
-      // Buy bar (Green UP)
       final double buyRatio = (item.buysCount / maxVal).clamp(0.0, 1.0);
       final double buyHeight = buyRatio * maxBarHeight;
       if (buyHeight > 0) {
-        final buyRect = Rect.fromLTRB(barLeft, baselineY - buyHeight, barRight, baselineY);
-        canvas.drawRect(buyRect, greenPaint);
+        final buyRect = RRect.fromRectAndRadius(
+          Rect.fromLTRB(barLeft, baselineY - buyHeight, barRight, baselineY),
+          const Radius.circular(2),
+        );
+        canvas.drawRRect(buyRect, greenPaint);
       }
 
-      // Sell bar (Red DOWN)
       final double sellRatio = (item.sellsCount / maxVal).clamp(0.0, 1.0);
       final double sellHeight = sellRatio * maxBarHeight;
       if (sellHeight > 0) {
-        final sellRect = Rect.fromLTRB(barLeft, baselineY, barRight, baselineY + sellHeight);
-        canvas.drawRect(sellRect, redPaint);
+        final sellRect = RRect.fromRectAndRadius(
+          Rect.fromLTRB(barLeft, baselineY, barRight, baselineY + sellHeight),
+          const Radius.circular(2),
+        );
+        canvas.drawRRect(sellRect, redPaint);
       }
 
-      // Date label
       final String shortDate = item.day.length >= 10
           ? '${item.day.substring(5, 7)}/${item.day.substring(8, 10)}'
           : item.day;
@@ -303,7 +412,7 @@ class ScalpingChartPainter extends CustomPainter {
         text: shortDate,
         style: const TextStyle(
           color: TvTableTheme.tvTextSecondary,
-          fontSize: 10.5,
+          fontSize: 10.0,
         ),
       );
 
@@ -324,4 +433,3 @@ class ScalpingChartPainter extends CustomPainter {
     return oldDelegate.items != items || oldDelegate.maxVal != maxVal;
   }
 }
-

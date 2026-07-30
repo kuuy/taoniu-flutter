@@ -61,7 +61,7 @@ class HomePage extends GetView<HomeController> {
                   ],
                 ),
                 Text(
-                  '10 Modules',
+                  '12 Modules',
                   style: TextStyle(
                     color: TvTableTheme.tvTextSecondary.withValues(alpha: 0.7),
                     fontSize: 11,
@@ -222,6 +222,20 @@ class HomePage extends GetView<HomeController> {
         'route': AppRoutes.binanceSpotPositions,
       },
       {
+        'title': 'Gambling Calc',
+        'subtitle': '博弈止盈止损与仓位计算',
+        'icon': Icons.calculate_rounded,
+        'color': Colors.tealAccent,
+        'route': AppRoutes.binanceSpotGamblingCalc,
+      },
+      {
+        'title': 'Positions Calc',
+        'subtitle': '补仓与分步交易价格计算',
+        'icon': Icons.exposure_rounded,
+        'color': Colors.lightBlueAccent,
+        'route': AppRoutes.binanceSpotPositionsCalc,
+      },
+      {
         'title': 'Orders',
         'subtitle': '活动挂单与历史成交明细',
         'icon': Icons.list_alt_rounded,
@@ -236,6 +250,7 @@ class HomePage extends GetView<HomeController> {
         'route': AppRoutes.binanceSpotPlans,
       },
     ];
+
 
     return GridView.builder(
       shrinkWrap: true,

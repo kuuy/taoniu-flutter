@@ -82,7 +82,7 @@ class TradingsScalpingPage extends GetView<TradingsScalpingController> {
                     return [
                       DataCell(
                         Text(
-                          '\$${item.buyPrice.toStringAsFixed(2)}',
+                          item.buyPrice.toString(),
                           style: const TextStyle(
                             color: TvTableTheme.tvGreen,
                             fontSize: 12,
@@ -93,7 +93,7 @@ class TradingsScalpingPage extends GetView<TradingsScalpingController> {
                       ),
                       DataCell(
                         Text(
-                          '\$${item.sellPrice.toStringAsFixed(2)}',
+                          item.sellPrice.toString(),
                           style: const TextStyle(
                             color: TvTableTheme.tvRed,
                             fontSize: 12,
@@ -104,18 +104,18 @@ class TradingsScalpingPage extends GetView<TradingsScalpingController> {
                       ),
                       DataCell(
                         Text(
-                          item.buyQuantity.toStringAsFixed(4),
+                          item.buyQuantity.toString(),
                           style: TvTableTheme.numberTextStyle,
                         ),
                       ),
                       DataCell(
                         Text(
-                          item.sellQuantity.toStringAsFixed(4),
+                          item.sellQuantity.toString(),
                           style: TvTableTheme.numberTextStyle,
                         ),
                       ),
                       DataCell(
-                        _buildStatusChip(item.status.toString()),
+                        _buildStatusChip(item.status),
                       ),
                     ];
                   },
@@ -168,18 +168,42 @@ class TradingsScalpingPage extends GetView<TradingsScalpingController> {
     );
   }
 
-  Widget _buildStatusChip(String status) {
+  Widget _buildStatusChip(int status) {
     Color color;
     String label;
-    if (status == '1' || status.toUpperCase() == 'COMPLETED') {
-      color = TvTableTheme.tvGreen;
-      label = 'COMPLETED';
-    } else if (status == '0' || status.toUpperCase() == 'RUNNING') {
-      color = TvTableTheme.tvBlue;
-      label = 'RUNNING';
-    } else {
-      color = TvTableTheme.tvAmber;
-      label = status;
+
+    switch (status) {
+      case 0:
+        color = TvTableTheme.tvBlue;
+        label = 'BUYING';
+        break;
+      case 1:
+        color = TvTableTheme.tvBlue;
+        label = 'BOUGHT';
+        break;
+      case 2:
+        color = TvTableTheme.tvAmber;
+        label = 'SELLING';
+        break;
+      case 3:
+        color = TvTableTheme.tvAmber;
+        label = 'SOLD';
+        break;
+      case 4:
+        color = TvTableTheme.tvRed;
+        label = 'CANCELED';
+        break;
+      case 5:
+        color = TvTableTheme.tvGreen;
+        label = 'FINISHED';
+        break;
+      case 6:
+        color = TvTableTheme.tvRed;
+        label = 'TIMEOUT';
+        break;
+      default:
+        color = TvTableTheme.tvAmber;
+        label = status.toString();
     }
 
     return Container(

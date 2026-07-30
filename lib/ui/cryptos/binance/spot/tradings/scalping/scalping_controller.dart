@@ -25,7 +25,7 @@ class TradingsScalpingController extends GetxController {
     }
 
     try {
-      final symbolQuery = selectedSymbol.value == 'ALL' ? 'BTCUSDT' : selectedSymbol.value;
+      final symbolQuery = selectedSymbol.value == 'ALL' ? '' : selectedSymbol.value;
       final response = await ScalpingApi.listings(
         symbol: symbolQuery,
         current: _currentPage,

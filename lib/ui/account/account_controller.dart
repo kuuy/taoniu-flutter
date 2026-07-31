@@ -53,15 +53,17 @@ class AccountController extends GetxController {
     binanceSecretKey.value = secretKey;
 
     Get.back();
-    Get.snackbar(
-      '密钥设置',
-      '币安 API Key 已成功保存',
-      snackPosition: SnackPosition.TOP,
-      backgroundColor: const Color(0xFF1E222D),
-      colorText: Colors.white,
-      duration: const Duration(seconds: 2),
-      icon: const Icon(Icons.check_circle_outline, color: Color(0xFF089981)),
-    );
+    if (Get.context != null) {
+      Get.snackbar(
+        '密钥设置',
+        '币安 API Key 已成功保存',
+        snackPosition: SnackPosition.TOP,
+        backgroundColor: const Color(0xFF1E222D),
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+        icon: const Icon(Icons.check_circle_outline, color: Color(0xFF089981)),
+      );
+    }
   }
 
   void toggleApiKeyVisibility() {

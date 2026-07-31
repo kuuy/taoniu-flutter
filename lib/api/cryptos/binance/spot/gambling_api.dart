@@ -1,6 +1,6 @@
 import 'package:taoniu/http/api_client.dart';
 import 'package:taoniu/http/api_response.dart';
-import 'package:taoniu/models/binance/spot/gambling_calc.dart';
+import 'package:taoniu/models/cryptos/binance/spot/gambling_calc.dart';
 
 class GamblingApi {
   static Future<ApiResponse<GamblingCalcResult>> calc({

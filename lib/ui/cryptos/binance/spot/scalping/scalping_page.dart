@@ -2,7 +2,7 @@ import 'package:easy_refresh/easy_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:taoniu/models/binance/spot/scalping.dart';
+import 'package:taoniu/models/cryptos/binance/spot/scalping.dart';
 import 'package:taoniu/routes/app_routes.dart';
 import 'package:taoniu/ui/components/tables/tradingview_table_theme.dart';
 import 'package:taoniu/ui/components/pulsing_badge.dart';

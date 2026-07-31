@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:taoniu/api/cryptos/binance/spot/analysis/tradings/scalping_api.dart';
-import 'package:taoniu/models/binance/spot/analysis/tradings/scalping.dart';
+import 'package:taoniu/models/cryptos/binance/spot/analysis/tradings/scalping.dart';
 
 class AnalysisTradingsScalpingController extends GetxController {
   final isLoading = false.obs;

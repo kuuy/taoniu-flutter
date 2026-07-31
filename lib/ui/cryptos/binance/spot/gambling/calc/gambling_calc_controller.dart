@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taoniu/api/cryptos/binance/spot/gambling_api.dart';
-import 'package:taoniu/models/binance/spot/gambling_calc.dart';
+import 'package:taoniu/models/cryptos/binance/spot/gambling_calc.dart';
 
 class GamblingCalcController extends GetxController {
   static const String _keySymbol = 'gambling_calc_symbol';

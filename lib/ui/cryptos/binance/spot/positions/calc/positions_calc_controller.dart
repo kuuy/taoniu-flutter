@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taoniu/api/cryptos/binance/spot/positions_api.dart';
-import 'package:taoniu/models/binance/spot/position_calc.dart';
+import 'package:taoniu/models/cryptos/binance/spot/position_calc.dart';
 
 class PositionsCalcController extends GetxController {
   static const String _keySymbol = 'pos_calc_symbol';

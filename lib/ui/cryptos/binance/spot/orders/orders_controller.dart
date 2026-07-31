@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:taoniu/api/cryptos/binance/spot/orders_api.dart';
-import 'package:taoniu/models/binance/spot/order.dart';
+import 'package:taoniu/models/cryptos/binance/spot/order.dart';
 
 class OrdersController extends GetxController {
   final items = <Order>[].obs;

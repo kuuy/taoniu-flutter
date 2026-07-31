@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:taoniu/models/binance/spot/kline.dart';
+import 'package:taoniu/models/cryptos/binance/spot/kline.dart';
 
 class TradingViewChart extends StatefulWidget {
   final String symbol;

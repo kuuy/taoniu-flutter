@@ -1,6 +1,6 @@
 import 'package:taoniu/http/api_client.dart';
 import 'package:taoniu/http/api_response.dart';
-import 'package:taoniu/models/binance/spot/order.dart';
+import 'package:taoniu/models/cryptos/binance/spot/order.dart';
 
 class OrdersApi {
   static Future<PaginateResponse<Order>> listings({

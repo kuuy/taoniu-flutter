@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:taoniu/api/cryptos/binance/spot/klines_api.dart';
+import 'package:taoniu/routes/app_routes.dart';
 import 'package:taoniu/ui/components/charts/tradingview_chart.dart';
 import 'package:taoniu/ui/components/tables/tradingview_table_theme.dart';
 import 'tradings_controller.dart';
@@ -338,6 +339,46 @@ class TradingsPage extends GetView<TradingsController> {
                     _buildDetailRow('Price', '\$${item['price']}'),
                     _buildDetailRow('Quantity', item['quantity'].toString()),
                     _buildDetailRow('Status', item['status'].toString()),
+                    const SizedBox(height: 20),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: TvTableTheme.tvBlue,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      onPressed: () {
+                        controller.closeTradingDrawer();
+                        Get.toNamed(
+                          AppRoutes.binanceSpotPositionsCalc,
+                          arguments: {
+                            'symbol': item['symbol'].toString(),
+                            'entryPrice': double.tryParse(item['price'].toString()) ?? 0.0,
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.exposure_rounded, size: 18),
+                      label: const Text('带入 Positions Calc'),
+                    ),
+                    const SizedBox(height: 10),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: TvTableTheme.tvCyan,
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      onPressed: () {
+                        controller.closeTradingDrawer();
+                        Get.toNamed(
+                          AppRoutes.binanceSpotGamblingCalc,
+                          arguments: {
+                            'symbol': item['symbol'].toString(),
+                            'entryPrice': double.tryParse(item['price'].toString()) ?? 0.0,
+                          },
+                        );
+                      },
+                      icon: const Icon(Icons.calculate_rounded, size: 18),
+                      label: const Text('带入 Gambling Calc'),
+                    ),
                   ],
                 ),
               ),

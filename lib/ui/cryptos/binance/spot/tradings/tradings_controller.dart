@@ -5,8 +5,8 @@ import 'package:taoniu/api/cryptos/binance/spot/indicators_api.dart';
 import 'package:taoniu/api/cryptos/binance/spot/strategies_api.dart';
 import 'package:taoniu/api/cryptos/binance/spot/klines_api.dart';
 import 'package:taoniu/http/api_service.dart';
-import 'package:taoniu/models/binance/spot/strategy.dart';
-import 'package:taoniu/models/binance/spot/kline.dart';
+import 'package:taoniu/models/cryptos/binance/spot/strategy.dart';
+import 'package:taoniu/models/cryptos/binance/spot/kline.dart';
 
 class TradingsController extends GetxController {
   static const String _keySymbol = 'TRADINGVIEW_SELECTED_SYMBOL';

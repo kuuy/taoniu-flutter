@@ -1,6 +1,6 @@
 import 'package:taoniu/http/api_client.dart';
 import 'package:taoniu/http/api_response.dart';
-import 'package:taoniu/models/binance/spot/strategy.dart';
+import 'package:taoniu/models/cryptos/binance/spot/strategy.dart';
 
 class StrategiesApi {
   static Future<PaginateResponse<Strategy>> listings({

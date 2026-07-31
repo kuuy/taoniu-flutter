@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:taoniu/api/cryptos/binance/spot/positions_api.dart';
-import 'package:taoniu/models/binance/spot/position.dart';
+import 'package:taoniu/models/cryptos/binance/spot/position.dart';
 
 class PositionsController extends GetxController {
   final items = <Position>[].obs;

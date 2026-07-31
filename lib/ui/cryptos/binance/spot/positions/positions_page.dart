@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:taoniu/models/binance/spot/position.dart';
+import 'package:taoniu/models/cryptos/binance/spot/position.dart';
 import 'package:taoniu/routes/app_routes.dart';
 import 'package:taoniu/ui/components/tables/tradingview_table_theme.dart';
 import 'positions_controller.dart';

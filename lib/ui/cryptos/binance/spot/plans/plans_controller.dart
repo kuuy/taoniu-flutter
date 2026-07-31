@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:taoniu/api/cryptos/binance/spot/plans_api.dart';
-import 'package:taoniu/models/binance/spot/plan.dart';
+import 'package:taoniu/models/cryptos/binance/spot/plan.dart';
 
 class BinanceSpotPlansController extends GetxController {
   var items = <Plan>[].obs;

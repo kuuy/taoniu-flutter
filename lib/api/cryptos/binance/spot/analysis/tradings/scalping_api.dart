@@ -1,6 +1,6 @@
 import 'package:taoniu/http/api_client.dart';
 import 'package:taoniu/http/api_response.dart';
-import 'package:taoniu/models/binance/spot/analysis/tradings/scalping.dart';
+import 'package:taoniu/models/cryptos/binance/spot/analysis/tradings/scalping.dart';
 
 class ScalpingApi {
   static Future<PaginateResponse<Scalping>> listings({

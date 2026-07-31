@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:taoniu/models/binance/spot/plan.dart';
+import 'package:taoniu/models/cryptos/binance/spot/plan.dart';
 import 'package:taoniu/routes/app_routes.dart';
 import 'package:taoniu/ui/components/tables/tradingview_table_theme.dart';
 import 'plans_controller.dart';

@@ -1,7 +1,7 @@
 import 'package:taoniu/http/api_client.dart';
 import 'package:taoniu/http/api_response.dart';
-import 'package:taoniu/models/binance/spot/position.dart';
-import 'package:taoniu/models/binance/spot/position_calc.dart';
+import 'package:taoniu/models/cryptos/binance/spot/position.dart';
+import 'package:taoniu/models/cryptos/binance/spot/position_calc.dart';
 
 class PositionsApi {
   static Future<ApiResponse<List<Position>>> gets() async {

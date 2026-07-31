@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:taoniu/http/api_client.dart';
 import 'package:taoniu/http/api_response.dart';
-import 'package:taoniu/models/binance/spot/kline.dart';
+import 'package:taoniu/models/cryptos/binance/spot/kline.dart';
 
 class KlinesApi {
   static final Dio _publicDio = Dio();

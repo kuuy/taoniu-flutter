@@ -1,6 +1,6 @@
 import 'package:get/get.dart';
 import 'package:taoniu/api/cryptos/binance/spot/scalping_api.dart';
-import 'package:taoniu/models/binance/spot/scalping.dart';
+import 'package:taoniu/models/cryptos/binance/spot/scalping.dart';
 
 class ScalpingController extends GetxController {
   var items = <Scalping>[].obs;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:taoniu/models/binance/spot/analysis/tradings/scalping.dart';
+import 'package:taoniu/models/cryptos/binance/spot/analysis/tradings/scalping.dart';
 import 'package:taoniu/ui/components/tables/tradingview_table_theme.dart';
 import 'scalping_controller.dart';
 

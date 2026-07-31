@@ -212,33 +212,21 @@ class GamblingCalcPage extends GetView<GamblingCalcController> {
         children: [
           _buildSummaryCard(
             '止盈目标价',
-<<<<<<< Updated upstream
-            res.takePrice.toStringAsFixed(4),
-=======
             res.takePrice.toString(),
->>>>>>> Stashed changes
             TvTableTheme.tvGreen,
             Icons.arrow_upward_rounded,
           ),
           const SizedBox(width: 8),
           _buildSummaryCard(
             '止损触发价',
-<<<<<<< Updated upstream
-            res.stopPrice.toStringAsFixed(4),
-=======
             res.stopPrice.toString(),
->>>>>>> Stashed changes
             TvTableTheme.tvRed,
             Icons.arrow_downward_rounded,
           ),
           const SizedBox(width: 8),
           _buildSummaryCard(
             '计划预估收益',
-<<<<<<< Updated upstream
-            res.planProfit.toStringAsFixed(4),
-=======
             res.planProfit.toString(),
->>>>>>> Stashed changes
             TvTableTheme.tvAmber,
             Icons.account_balance_wallet_outlined,
           ),

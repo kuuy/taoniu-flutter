@@ -260,11 +260,7 @@ class PositionsCalcPage extends GetView<PositionsCalcController> {
           return [
             DataCell(
               Text(
-<<<<<<< Updated upstream
-                item.buyPrice.toStringAsFixed(4),
-=======
                 item.buyPrice.toString(),
->>>>>>> Stashed changes
                 style: const TextStyle(
                   color: TvTableTheme.tvGreen,
                   fontWeight: FontWeight.w600,
@@ -275,11 +271,7 @@ class PositionsCalcPage extends GetView<PositionsCalcController> {
             ),
             DataCell(
               Text(
-<<<<<<< Updated upstream
-                item.sellPrice.toStringAsFixed(4),
-=======
                 item.sellPrice.toString(),
->>>>>>> Stashed changes
                 style: const TextStyle(
                   color: TvTableTheme.tvRed,
                   fontWeight: FontWeight.w600,
@@ -288,15 +280,9 @@ class PositionsCalcPage extends GetView<PositionsCalcController> {
                 ),
               ),
             ),
-<<<<<<< Updated upstream
-            DataCell(Text(item.quantity.toStringAsFixed(4), style: TvTableTheme.numberTextStyle)),
-            DataCell(Text(item.entryPrice.toStringAsFixed(4), style: TvTableTheme.numberTextStyle)),
-            DataCell(Text(item.entryQuantity.toStringAsFixed(4), style: TvTableTheme.numberTextStyle)),
-=======
             DataCell(Text(item.quantity.toString(), style: TvTableTheme.numberTextStyle)),
             DataCell(Text(item.entryPrice.toString(), style: TvTableTheme.numberTextStyle)),
             DataCell(Text(item.entryQuantity.toString(), style: TvTableTheme.numberTextStyle)),
->>>>>>> Stashed changes
           ];
         },
       ),

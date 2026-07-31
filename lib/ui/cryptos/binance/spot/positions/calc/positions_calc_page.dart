@@ -166,22 +166,14 @@ class PositionsCalcPage extends GetView<PositionsCalcController> {
         children: [
           _buildSummaryCard(
             '止盈目标价 (Take Price)',
-<<<<<<< Updated upstream
-            res.takePrice.toStringAsFixed(4),
-=======
             res.takePrice.toString(),
->>>>>>> Stashed changes
             TvTableTheme.tvGreen,
             Icons.arrow_upward_rounded,
           ),
           const SizedBox(width: 10),
           _buildSummaryCard(
             '止损触发价 (Stop Price)',
-<<<<<<< Updated upstream
-            res.stopPrice.toStringAsFixed(4),
-=======
             res.stopPrice.toString(),
->>>>>>> Stashed changes
             TvTableTheme.tvRed,
             Icons.arrow_downward_rounded,
           ),

@@ -323,19 +323,11 @@ class GamblingCalcPage extends GetView<GamblingCalcController> {
         remainingCellsBuilder: (index) {
           final plan = res.plans[index];
           return [
-<<<<<<< Updated upstream
-            DataCell(Text(plan.price.toStringAsFixed(4), style: TvTableTheme.numberTextStyle)),
-            DataCell(Text(plan.quantity.toStringAsFixed(4), style: TvTableTheme.numberTextStyle)),
-            DataCell(
-              Text(
-                plan.takeProfit.toStringAsFixed(4),
-=======
             DataCell(Text(plan.price.toString(), style: TvTableTheme.numberTextStyle)),
             DataCell(Text(plan.quantity.toString(), style: TvTableTheme.numberTextStyle)),
             DataCell(
               Text(
                 plan.takeProfit.toString(),
->>>>>>> Stashed changes
                 style: TextStyle(
                   color: plan.takeProfit >= 0 ? TvTableTheme.tvGreen : TvTableTheme.tvRed,
                   fontWeight: FontWeight.bold,
@@ -344,17 +336,10 @@ class GamblingCalcPage extends GetView<GamblingCalcController> {
                 ),
               ),
             ),
-<<<<<<< Updated upstream
-            DataCell(Text(plan.amount.toStringAsFixed(4), style: TvTableTheme.numberTextStyle)),
-            DataCell(
-              Text(
-                plan.profit.toStringAsFixed(4),
-=======
             DataCell(Text(plan.amount.toString(), style: TvTableTheme.numberTextStyle)),
             DataCell(
               Text(
                 plan.profit.toString(),
->>>>>>> Stashed changes
                 style: TextStyle(
                   color: plan.profit >= 0 ? TvTableTheme.tvGreen : TvTableTheme.tvRed,
                   fontWeight: FontWeight.bold,

@@ -47,7 +47,9 @@ class ScalpingController extends GetxController {
         items.addAll(newItems);
       }
     } catch (e) {
-      Get.snackbar('数据请求失败', e.toString(), snackPosition: SnackPosition.TOP);
+      if (Get.context != null) {
+        Get.snackbar('数据请求失败', e.toString(), snackPosition: SnackPosition.TOP);
+      }
     } finally {
       isLoading(false);
       isRefreshing(false);

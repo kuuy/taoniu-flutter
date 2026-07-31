@@ -6,6 +6,13 @@ import 'package:taoniu/api/cryptos/binance/spot/tickers/ranking_api.dart';
 import 'package:taoniu/models/cryptos/binance/spot/spot_ticker.dart';
 import 'package:taoniu/services/binance_spot_ws_service.dart';
 
+enum TickerSortField {
+  change24h,
+  price,
+  volume,
+  symbol,
+}
+
 class RealtimeTickersController extends GetxController {
   final BinanceSpotWsService wsService = BinanceSpotWsService();
   static const String _keyCachedSymbols = 'REALTIME_TICKERS_CACHED_SYMBOLS';
@@ -16,6 +23,11 @@ class RealtimeTickersController extends GetxController {
   final searchQuery = ''.obs;
   final wsStatus = WsConnectionStatus.disconnected.obs;
   final isLoadingRanking = false.obs;
+
+  final sortField = TickerSortField.change24h.obs;
+  final sortAscending = false.obs;
+
+  final presetSymbols = const ['BTCUSDT', 'ETHUSDT', 'SOLUSDT', 'BNBUSDT', 'DOGEUSDT', 'XRPUSDT', 'PEPEUSDT'];
 
   StreamSubscription? _statusSub;
   StreamSubscription? _messageSub;
@@ -32,13 +44,41 @@ class RealtimeTickersController extends GetxController {
     final query = searchQuery.value.trim().toUpperCase();
     final list = activeSymbols.map((sym) => _getOrCreateTicker(sym)).toList();
 
-    // Sort in real-time in descending order by 24h change percentage (highest gainers first)
-    list.sort((a, b) => b.change24h.value.compareTo(a.change24h.value));
+    list.sort((a, b) {
+      int cmp = 0;
+      switch (sortField.value) {
+        case TickerSortField.change24h:
+          cmp = a.change24h.value.compareTo(b.change24h.value);
+          break;
+        case TickerSortField.price:
+          cmp = a.price.value.compareTo(b.price.value);
+          break;
+        case TickerSortField.volume:
+          cmp = a.volume.value.compareTo(b.volume.value);
+          break;
+        case TickerSortField.symbol:
+          cmp = a.symbol.compareTo(b.symbol);
+          break;
+      }
+      return sortAscending.value ? cmp : -cmp;
+    });
 
     if (query.isEmpty) {
       return list;
     }
     return list.where((t) => t.symbol.toUpperCase().contains(query)).toList();
+  }
+
+  int get gainersCount => activeSymbols.where((sym) => _getOrCreateTicker(sym).change24h.value > 0).length;
+  int get losersCount => activeSymbols.where((sym) => _getOrCreateTicker(sym).change24h.value < 0).length;
+
+  void toggleSort(TickerSortField field) {
+    if (sortField.value == field) {
+      sortAscending.value = !sortAscending.value;
+    } else {
+      sortField.value = field;
+      sortAscending.value = false;
+    }
   }
 
   @override

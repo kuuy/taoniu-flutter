@@ -24,6 +24,10 @@ class IndicatorsRankingController extends GetxController {
     "take_profit_ratio",
   ];
 
+  final searchQuery = ''.obs;
+  final sortFieldIndex = 5.obs; // Default to poc_ratio
+  final sortAscending = false.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -36,6 +40,46 @@ class IndicatorsRankingController extends GetxController {
   void onClose() {
     pageController.dispose();
     super.onClose();
+  }
+
+  void toggleSort(int fieldIndex) {
+    if (sortFieldIndex.value == fieldIndex) {
+      sortAscending.value = !sortAscending.value;
+    } else {
+      sortFieldIndex.value = fieldIndex;
+      sortAscending.value = false;
+    }
+  }
+
+  List<String> getFilteredData(String interval) {
+    final rawList = rankingData[interval] ?? [];
+    final q = searchQuery.value.trim().toUpperCase();
+
+    var list = rawList.map((item) => item).toList();
+
+    if (q.isNotEmpty) {
+      list = list.where((item) {
+        final symbol = item.split(',')[0].trim().toUpperCase();
+        return symbol.contains(q);
+      }).toList();
+    }
+
+    final fIdx = sortFieldIndex.value;
+    list.sort((a, b) {
+      final partsA = a.split(',');
+      final partsB = b.split(',');
+
+      final valAStr = (fIdx + 1 < partsA.length) ? partsA[fIdx + 1] : '';
+      final valBStr = (fIdx + 1 < partsB.length) ? partsB[fIdx + 1] : '';
+
+      final numA = double.tryParse(valAStr) ?? double.negativeInfinity;
+      final numB = double.tryParse(valBStr) ?? double.negativeInfinity;
+
+      final cmp = numA.compareTo(numB);
+      return sortAscending.value ? cmp : -cmp;
+    });
+
+    return list;
   }
 
   void setInterval(String interval) {
@@ -73,12 +117,12 @@ class IndicatorsRankingController extends GetxController {
         fields: fields.join(','),
         sort: "poc_ratio,-1",
         current: 1,
-        pageSize: 100,
+        pageSize: 200,
       );
       rankingData[currentIntv] = response.data ?? [];
       items.value = rankingData[currentIntv] ?? [];
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      if (Get.context != null) Get.snackbar('获取指标数据失败', e.toString());
     } finally {
       isLoading(false);
     }

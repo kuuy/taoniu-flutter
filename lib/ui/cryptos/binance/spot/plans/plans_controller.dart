@@ -8,6 +8,7 @@ class BinanceSpotPlansController extends GetxController {
   var isLoading = true.obs;
   var selectedInterval = '1m'.obs;
   final plansData = <String, List<Plan>>{}.obs;
+  final searchQuery = ''.obs;
 
   final intervals = ['1m', '15m', '4h', '1d'];
   late PageController pageController;
@@ -24,6 +25,14 @@ class BinanceSpotPlansController extends GetxController {
   void onClose() {
     pageController.dispose();
     super.onClose();
+  }
+
+  List<Plan> getFilteredData(String interval) {
+    final rawList = plansData[interval] ?? [];
+    final q = searchQuery.value.trim().toUpperCase();
+
+    if (q.isEmpty) return rawList;
+    return rawList.where((p) => p.symbol.toUpperCase().contains(q)).toList();
   }
 
   void setInterval(String interval) {
@@ -64,7 +73,9 @@ class BinanceSpotPlansController extends GetxController {
       plansData[currentIntv] = response.data ?? [];
       items.value = plansData[currentIntv] ?? [];
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      if (Get.context != null) {
+        Get.snackbar('获取计划列表失败', e.toString());
+      }
     } finally {
       isLoading(false);
     }

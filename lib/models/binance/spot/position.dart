@@ -23,11 +23,24 @@ class Position {
     required this.timestamp,
   });
 
+  bool get isBuy => side == 1;
+
   factory Position.fromJson(Map<String, dynamic> json) {
+    final rawSide = json['side']?.toString() ?? '';
+    int sideVal = int.tryParse(rawSide) ?? 0;
+    if (sideVal == 0) {
+      final u = rawSide.trim().toUpperCase();
+      if (u == 'BUY' || u == 'BUY_LIMIT' || u == 'LONG') {
+        sideVal = 1;
+      } else if (u == 'SELL' || u == 'SELL_LIMIT' || u == 'SHORT') {
+        sideVal = 2;
+      }
+    }
+
     return Position(
       id: json['id']?.toString() ?? '',
       symbol: json['symbol']?.toString() ?? '',
-      side: int.tryParse(json['side']?.toString() ?? '') ?? 0,
+      side: sideVal,
       leverage: double.tryParse(json['leverage']?.toString() ?? '') ?? 0.0,
       capital: double.tryParse(json['capital']?.toString() ?? '') ?? 0.0,
       notional: double.tryParse(json['notional']?.toString() ?? '') ?? 0.0,

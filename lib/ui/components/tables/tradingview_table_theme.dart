@@ -136,6 +136,7 @@ class TvTableTheme {
               ],
             ),
             child: DataTable(
+              showCheckboxColumn: false,
               headingRowHeight: headingRowHeight,
               dataRowMinHeight: dataRowMinHeight,
               dataRowMaxHeight: dataRowMaxHeight,
@@ -179,6 +180,7 @@ class TvTableTheme {
                       minWidth: constraints.maxWidth,
                     ),
                     child: DataTable(
+                      showCheckboxColumn: false,
                       headingRowHeight: headingRowHeight,
                       dataRowMinHeight: dataRowMinHeight,
                       dataRowMaxHeight: dataRowMaxHeight,

@@ -40,6 +40,10 @@ import '../ui/cryptos/binance/spot/tradings/tradings_page.dart';
 import '../ui/cryptos/binance/spot/tradings/tradings_binding.dart';
 import '../ui/cryptos/binance/spot/tradings/scalping/scalping_page.dart';
 import '../ui/cryptos/binance/spot/tradings/scalping/scalping_binding.dart';
+import '../ui/cryptos/binance/spot/gambling/calc/gambling_calc_page.dart';
+import '../ui/cryptos/binance/spot/gambling/calc/gambling_calc_binding.dart';
+import '../ui/cryptos/binance/spot/positions/calc/positions_calc_page.dart';
+import '../ui/cryptos/binance/spot/positions/calc/positions_calc_binding.dart';
 
 class AppPages {
   static final routes = [
@@ -146,6 +150,18 @@ class AppPages {
       name: AppRoutes.binanceSpotTradingsScalping,
       page: () => const TradingsScalpingPage(),
       binding: TradingsScalpingBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: AppRoutes.binanceSpotGamblingCalc,
+      page: () => const GamblingCalcPage(),
+      binding: GamblingCalcBinding(),
+      middlewares: [AuthMiddleware()],
+    ),
+    GetPage(
+      name: AppRoutes.binanceSpotPositionsCalc,
+      page: () => const PositionsCalcPage(),
+      binding: PositionsCalcBinding(),
       middlewares: [AuthMiddleware()],
     ),
   ];

@@ -18,5 +18,7 @@ abstract class AppRoutes {
   static const binanceSpotTickersRealtime = '/cryptos/binance/spot/tickers/realtime';
   static const binanceSpotTradings = '/cryptos/binance/spot/tradings';
   static const binanceSpotTradingsScalping = '/cryptos/binance/spot/tradings/scalping';
+  static const binanceSpotGamblingCalc = '/cryptos/binance/spot/gambling/calc';
+  static const binanceSpotPositionsCalc = '/cryptos/binance/spot/positions/calc';
 }
 

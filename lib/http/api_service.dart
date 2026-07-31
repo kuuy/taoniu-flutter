@@ -7,7 +7,7 @@ class ApiService {
   final Dio _dio = DioClient().dio;
 
   // Read the base URL from the .env file
-  static String get baseUrl => dotenv.env['API_BASE_URL'] ?? 'http://127.0.0.1:8080';
+  static String get baseUrl => dotenv.env['API_BASE_URL'] ?? '';
 
   ApiService() {
     _dio.options.baseUrl = baseUrl;

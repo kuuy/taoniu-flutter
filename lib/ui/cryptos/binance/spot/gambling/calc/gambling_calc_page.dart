@@ -212,21 +212,33 @@ class GamblingCalcPage extends GetView<GamblingCalcController> {
         children: [
           _buildSummaryCard(
             '止盈目标价',
+<<<<<<< Updated upstream
             res.takePrice.toStringAsFixed(4),
+=======
+            res.takePrice.toString(),
+>>>>>>> Stashed changes
             TvTableTheme.tvGreen,
             Icons.arrow_upward_rounded,
           ),
           const SizedBox(width: 8),
           _buildSummaryCard(
             '止损触发价',
+<<<<<<< Updated upstream
             res.stopPrice.toStringAsFixed(4),
+=======
+            res.stopPrice.toString(),
+>>>>>>> Stashed changes
             TvTableTheme.tvRed,
             Icons.arrow_downward_rounded,
           ),
           const SizedBox(width: 8),
           _buildSummaryCard(
             '计划预估收益',
+<<<<<<< Updated upstream
             res.planProfit.toStringAsFixed(4),
+=======
+            res.planProfit.toString(),
+>>>>>>> Stashed changes
             TvTableTheme.tvAmber,
             Icons.account_balance_wallet_outlined,
           ),
@@ -311,11 +323,19 @@ class GamblingCalcPage extends GetView<GamblingCalcController> {
         remainingCellsBuilder: (index) {
           final plan = res.plans[index];
           return [
+<<<<<<< Updated upstream
             DataCell(Text(plan.price.toStringAsFixed(4), style: TvTableTheme.numberTextStyle)),
             DataCell(Text(plan.quantity.toStringAsFixed(4), style: TvTableTheme.numberTextStyle)),
             DataCell(
               Text(
                 plan.takeProfit.toStringAsFixed(4),
+=======
+            DataCell(Text(plan.price.toString(), style: TvTableTheme.numberTextStyle)),
+            DataCell(Text(plan.quantity.toString(), style: TvTableTheme.numberTextStyle)),
+            DataCell(
+              Text(
+                plan.takeProfit.toString(),
+>>>>>>> Stashed changes
                 style: TextStyle(
                   color: plan.takeProfit >= 0 ? TvTableTheme.tvGreen : TvTableTheme.tvRed,
                   fontWeight: FontWeight.bold,
@@ -324,10 +344,17 @@ class GamblingCalcPage extends GetView<GamblingCalcController> {
                 ),
               ),
             ),
+<<<<<<< Updated upstream
             DataCell(Text(plan.amount.toStringAsFixed(4), style: TvTableTheme.numberTextStyle)),
             DataCell(
               Text(
                 plan.profit.toStringAsFixed(4),
+=======
+            DataCell(Text(plan.amount.toString(), style: TvTableTheme.numberTextStyle)),
+            DataCell(
+              Text(
+                plan.profit.toString(),
+>>>>>>> Stashed changes
                 style: TextStyle(
                   color: plan.profit >= 0 ? TvTableTheme.tvGreen : TvTableTheme.tvRed,
                   fontWeight: FontWeight.bold,

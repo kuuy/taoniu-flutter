@@ -166,14 +166,22 @@ class PositionsCalcPage extends GetView<PositionsCalcController> {
         children: [
           _buildSummaryCard(
             '止盈目标价 (Take Price)',
+<<<<<<< Updated upstream
             res.takePrice.toStringAsFixed(4),
+=======
+            res.takePrice.toString(),
+>>>>>>> Stashed changes
             TvTableTheme.tvGreen,
             Icons.arrow_upward_rounded,
           ),
           const SizedBox(width: 10),
           _buildSummaryCard(
             '止损触发价 (Stop Price)',
+<<<<<<< Updated upstream
             res.stopPrice.toStringAsFixed(4),
+=======
+            res.stopPrice.toString(),
+>>>>>>> Stashed changes
             TvTableTheme.tvRed,
             Icons.arrow_downward_rounded,
           ),
@@ -260,7 +268,11 @@ class PositionsCalcPage extends GetView<PositionsCalcController> {
           return [
             DataCell(
               Text(
+<<<<<<< Updated upstream
                 item.buyPrice.toStringAsFixed(4),
+=======
+                item.buyPrice.toString(),
+>>>>>>> Stashed changes
                 style: const TextStyle(
                   color: TvTableTheme.tvGreen,
                   fontWeight: FontWeight.w600,
@@ -271,7 +283,11 @@ class PositionsCalcPage extends GetView<PositionsCalcController> {
             ),
             DataCell(
               Text(
+<<<<<<< Updated upstream
                 item.sellPrice.toStringAsFixed(4),
+=======
+                item.sellPrice.toString(),
+>>>>>>> Stashed changes
                 style: const TextStyle(
                   color: TvTableTheme.tvRed,
                   fontWeight: FontWeight.w600,
@@ -280,9 +296,15 @@ class PositionsCalcPage extends GetView<PositionsCalcController> {
                 ),
               ),
             ),
+<<<<<<< Updated upstream
             DataCell(Text(item.quantity.toStringAsFixed(4), style: TvTableTheme.numberTextStyle)),
             DataCell(Text(item.entryPrice.toStringAsFixed(4), style: TvTableTheme.numberTextStyle)),
             DataCell(Text(item.entryQuantity.toStringAsFixed(4), style: TvTableTheme.numberTextStyle)),
+=======
+            DataCell(Text(item.quantity.toString(), style: TvTableTheme.numberTextStyle)),
+            DataCell(Text(item.entryPrice.toString(), style: TvTableTheme.numberTextStyle)),
+            DataCell(Text(item.entryQuantity.toString(), style: TvTableTheme.numberTextStyle)),
+>>>>>>> Stashed changes
           ];
         },
       ),

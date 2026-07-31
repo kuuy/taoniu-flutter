@@ -222,20 +222,6 @@ class HomePage extends GetView<HomeController> {
         'route': AppRoutes.binanceSpotPositions,
       },
       {
-<<<<<<< Updated upstream
-        'title': 'Gambling Calc',
-        'subtitle': '博弈止盈止损与仓位计算',
-        'icon': Icons.calculate_rounded,
-        'color': Colors.tealAccent,
-        'route': AppRoutes.binanceSpotGamblingCalc,
-      },
-      {
-        'title': 'Positions Calc',
-        'subtitle': '补仓与分步交易价格计算',
-        'icon': Icons.exposure_rounded,
-        'color': Colors.lightBlueAccent,
-        'route': AppRoutes.binanceSpotPositionsCalc,
-=======
         'title': 'Positions Calc',
         'subtitle': '仓位阶梯建仓与止盈止损推演',
         'icon': Icons.calculate_outlined,
@@ -248,7 +234,6 @@ class HomePage extends GetView<HomeController> {
         'icon': Icons.casino_rounded,
         'color': Colors.pinkAccent,
         'route': AppRoutes.binanceSpotGamblingCalc,
->>>>>>> Stashed changes
       },
       {
         'title': 'Orders',

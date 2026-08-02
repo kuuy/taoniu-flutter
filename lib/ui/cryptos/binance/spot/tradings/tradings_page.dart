@@ -20,21 +20,28 @@ class TradingsPage extends GetView<TradingsController> {
         titleSpacing: 8.0,
         title: Obx(() => Row(
           children: [
-            DropdownButton<String>(
-              value: controller.selectedSymbol.value,
-              dropdownColor: const Color(0xFF1E222D),
-              style: const TextStyle(color: Color(0xFFF0F3FA), fontSize: 18, fontWeight: FontWeight.bold),
-              underline: const SizedBox(),
-              items: ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT'].map((symbol) {
-                return DropdownMenuItem(
-                  value: symbol,
-                  child: Text(symbol),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) controller.changeSymbol(value);
-              },
-            ),
+            Obx(() {
+              final currentSym = controller.selectedSymbol.value;
+              final symbolList = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT'];
+              if (currentSym.isNotEmpty && !symbolList.contains(currentSym)) {
+                symbolList.insert(0, currentSym);
+              }
+              return DropdownButton<String>(
+                value: symbolList.contains(currentSym) ? currentSym : symbolList.first,
+                dropdownColor: const Color(0xFF1E222D),
+                style: const TextStyle(color: Color(0xFFF0F3FA), fontSize: 18, fontWeight: FontWeight.bold),
+                underline: const SizedBox(),
+                items: symbolList.map((symbol) {
+                  return DropdownMenuItem(
+                    value: symbol,
+                    child: Text(symbol),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) controller.changeSymbol(value);
+                },
+              );
+            }),
             const SizedBox(width: 16),
             _buildIntervalChips(context),
           ],

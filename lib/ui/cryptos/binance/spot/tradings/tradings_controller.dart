@@ -49,15 +49,20 @@ class TradingsController extends GetxController {
 
   Future<void> _restoreSavedSymbolAndInterval() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final savedSymbol = prefs.getString(_keySymbol);
-      final savedInterval = prefs.getString(_keyInterval);
+      final args = Get.arguments;
+      if (args is Map && args['symbol'] != null && args['symbol'].toString().isNotEmpty) {
+        selectedSymbol.value = args['symbol'].toString().toUpperCase();
+      } else {
+        final prefs = await SharedPreferences.getInstance();
+        final savedSymbol = prefs.getString(_keySymbol);
+        final savedInterval = prefs.getString(_keyInterval);
 
-      if (savedSymbol != null && savedSymbol.isNotEmpty) {
-        selectedSymbol.value = savedSymbol;
-      }
-      if (savedInterval != null && savedInterval.isNotEmpty) {
-        selectedInterval.value = KlinesApi.normalizeInterval(savedInterval);
+        if (savedSymbol != null && savedSymbol.isNotEmpty) {
+          selectedSymbol.value = savedSymbol;
+        }
+        if (savedInterval != null && savedInterval.isNotEmpty) {
+          selectedInterval.value = KlinesApi.normalizeInterval(savedInterval);
+        }
       }
     } catch (_) {}
     await loadAllData();

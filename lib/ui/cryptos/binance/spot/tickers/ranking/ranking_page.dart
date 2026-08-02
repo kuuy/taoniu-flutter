@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:taoniu/models/cryptos/binance/spot/spot_ticker.dart';
 import 'package:taoniu/routes/app_routes.dart';
 import 'package:taoniu/ui/components/tables/tradingview_table_theme.dart';
 import 'ranking_controller.dart';
@@ -163,6 +164,19 @@ class TickersRankingPage extends GetView<TickersRankingController> {
               },
             ),
             ListTile(
+              leading: const Icon(Icons.candlestick_chart_rounded, color: TvTableTheme.tvGreen),
+              title: const Text('查看 TradingView K 线图表', style: TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 13.5)),
+              onTap: () {
+                Get.back();
+                Get.toNamed(
+                  AppRoutes.binanceSpotTradings,
+                  arguments: {
+                    'symbol': symbol,
+                  },
+                );
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.copy_rounded, color: TvTableTheme.tvAmber),
               title: const Text('复制 Symbol 名称', style: TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 13.5)),
               onTap: () {
@@ -278,17 +292,37 @@ class TickersRankingPage extends GetView<TickersRankingController> {
                         final numVal = double.tryParse(val);
 
                         if (numVal != null) {
-                          Color col = TvTableTheme.tvTextSecondary;
-                          if (fieldName == 'change') {
-                            if (numVal > 0) col = TvTableTheme.tvGreen;
-                            if (numVal < 0) col = TvTableTheme.tvRed;
-                          } else if (val.contains('.')) {
-                            if (numVal > 0 && fieldName.contains('change')) col = TvTableTheme.tvGreen;
-                            if (numVal < 0 && fieldName.contains('change')) col = TvTableTheme.tvRed;
+                          if (fieldName == 'change' || fieldName.contains('change')) {
+                            // Ranking API returns change as a decimal ratio (e.g. 0.0245 = 2.45%),
+                            // convert to percentage scale (* 100) to align with Realtime Tickers.
+                            final changePercent = numVal.abs() <= 1.0 ? numVal * 100 : numVal;
+                            final normVal = SpotTicker.normalizeChangePercent(changePercent);
+                            final isPositive = normVal > 0;
+                            final isZero = normVal.abs() < 0.0001;
+                            final Color textColor = isZero
+                                ? TvTableTheme.tvTextSecondary
+                                : isPositive
+                                    ? TvTableTheme.tvGreen
+                                    : TvTableTheme.tvRed;
+                            final sign = isPositive ? '+' : '';
+                            final displayStr = '$sign${normVal.toStringAsFixed(2)}%';
+
+                            return DataCell(
+                              Text(
+                                displayStr,
+                                style: TextStyle(
+                                  color: textColor,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  fontFeatures: const [FontFeature.tabularFigures()],
+                                ),
+                              ),
+                            );
                           }
+                          Color col = TvTableTheme.tvTextSecondary;
                           return DataCell(
                             Text(
-                              fieldName == 'change' ? '${numVal > 0 ? "+" : ""}${numVal.toStringAsFixed(2)}%' : val,
+                              val,
                               style: TextStyle(
                                 color: col,
                                 fontSize: 12,

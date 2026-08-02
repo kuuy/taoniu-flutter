@@ -3,6 +3,9 @@ import 'package:get/get.dart';
 import '../components/tables/tradingview_table_theme.dart';
 import '../components/pulsing_badge.dart';
 import '../components/animated_module_card.dart';
+import '../components/glass_card.dart';
+import '../components/stat_tile.dart';
+import '../components/mini_sparkline.dart';
 import '../../routes/app_routes.dart';
 import 'home_controller.dart';
 
@@ -37,11 +40,19 @@ class HomePage extends GetView<HomeController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 0. Live Ticker Tape Bar
+            _buildTickerTape(),
+            const SizedBox(height: 16),
+
             // 1. Dashboard Overview Banner
             _buildDashboardBanner(),
+            const SizedBox(height: 16),
+
+            // 2. Stat Tiles Summary Grid
+            _buildStatTilesGrid(),
             const SizedBox(height: 22),
 
-            // 2. Section Title: Modules Grid
+            // 3. Section Title: Modules Grid
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -72,11 +83,11 @@ class HomePage extends GetView<HomeController> {
             ),
             const SizedBox(height: 14),
 
-            // 3. Grid of Quant Modules with Micro-Animations
+            // 4. Grid of Quant Modules
             _buildModulesGrid(),
             const SizedBox(height: 22),
 
-            // 4. Live Strategy Signals Activity Feed
+            // 5. Live Strategy Signals Activity Feed
             _buildSignalsActivityCard(),
             const SizedBox(height: 24),
           ],
@@ -85,28 +96,82 @@ class HomePage extends GetView<HomeController> {
     );
   }
 
-  Widget _buildDashboardBanner() {
-    return Container(
-      padding: const EdgeInsets.all(18.0),
-      decoration: BoxDecoration(
-        gradient: TvTableTheme.tvBannerGradient,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: TvTableTheme.tvBorderColor, width: 1.0),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black38,
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
+  Widget _buildTickerTape() {
+    final tickers = [
+      {'symbol': 'BTC/USDT', 'price': '\$64,820.50', 'change': '+3.2%', 'isPos': true, 'data': [62.0, 62.5, 63.1, 64.0, 64.82]},
+      {'symbol': 'ETH/USDT', 'price': '\$3,510.20', 'change': '+2.8%', 'isPos': true, 'data': [3.4, 3.42, 3.48, 3.50, 3.51]},
+      {'symbol': 'SOL/USDT', 'price': '\$145.60', 'change': '-1.1%', 'isPos': false, 'data': [148.0, 147.2, 146.0, 144.5, 145.6]},
+      {'symbol': 'BNB/USDT', 'price': '\$582.40', 'change': '+1.5%', 'isPos': true, 'data': [570.0, 574.0, 578.0, 581.0, 582.4]},
+    ];
+
+    return SizedBox(
+      height: 64,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: tickers.length,
+        separatorBuilder: (context, index) => const SizedBox(width: 10),
+        itemBuilder: (context, index) {
+          final t = tickers[index];
+          final isPos = t['isPos'] as bool;
+          final color = isPos ? TvTableTheme.tvGreen : TvTableTheme.tvRed;
+          final data = t['data'] as List<double>;
+
+          return GlassCard(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            borderRadius: 10,
+            child: Row(
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      t['symbol'] as String,
+                      style: const TextStyle(color: TvTableTheme.tvTextHeader, fontSize: 10, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        Text(
+                          t['price'] as String,
+                          style: const TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          t['change'] as String,
+                          style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(width: 10),
+                MiniSparkline(
+                  data: data,
+                  color: color,
+                  width: 44,
+                  height: 22,
+                ),
+              ],
+            ),
+          );
+        },
       ),
+    );
+  }
+
+  Widget _buildDashboardBanner() {
+    return GlassCard(
+      padding: const EdgeInsets.all(18.0),
+      borderRadius: 16,
+      borderColor: TvTableTheme.tvBlue.withValues(alpha: 0.3),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
                   Icon(Icons.bolt_rounded, color: Colors.amber, size: 22),
                   SizedBox(width: 6),
@@ -114,14 +179,14 @@ class HomePage extends GetView<HomeController> {
                     '币安现货高频量化中枢',
                     style: TextStyle(
                       color: TvTableTheme.tvTextPrimary,
-                      fontSize: 15.5,
+                      fontSize: 16,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 0.3,
                     ),
                   ),
                 ],
               ),
-              const PulsingBadge(
+              PulsingBadge(
                 label: '实盘运行中',
                 color: TvTableTheme.tvGreen,
                 isLive: true,
@@ -157,6 +222,34 @@ class HomePage extends GetView<HomeController> {
             color: TvTableTheme.tvTextPrimary,
             fontSize: 12.5,
             fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatTilesGrid() {
+    return const Row(
+      children: [
+        Expanded(
+          child: StatTile(
+            title: '24H 策略收益',
+            value: '+\$1,248.50',
+            changeText: '+5.82%',
+            isPositive: true,
+            icon: Icons.trending_up,
+            iconColor: TvTableTheme.tvGreen,
+          ),
+        ),
+        SizedBox(width: 12),
+        Expanded(
+          child: StatTile(
+            title: '运行策略胜率',
+            value: '78.4%',
+            changeText: '+2.1% 本周',
+            isPositive: true,
+            icon: Icons.pie_chart_outline,
+            iconColor: TvTableTheme.tvCyan,
           ),
         ),
       ],
@@ -251,7 +344,6 @@ class HomePage extends GetView<HomeController> {
       },
     ];
 
-
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -276,20 +368,9 @@ class HomePage extends GetView<HomeController> {
   }
 
   Widget _buildSignalsActivityCard() {
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: TvTableTheme.tvHeaderBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: TvTableTheme.tvBorderColor),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 6,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
+      borderRadius: 16,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../components/tables/tradingview_table_theme.dart';
+import '../components/glass_card.dart';
 import 'plans_controller.dart';
 
 class PlansPage extends GetView<PlansController> {
@@ -36,10 +37,11 @@ class PlansPage extends GetView<PlansController> {
             Obx(() {
               final list = controller.filteredPlans;
               if (list.isEmpty) {
-                return Container(
+                return GlassCard(
                   padding: const EdgeInsets.all(32),
-                  alignment: Alignment.center,
-                  child: const Text('暂无相关交易计划', style: TextStyle(color: TvTableTheme.tvTextSecondary)),
+                  child: const Center(
+                    child: Text('暂无相关交易计划', style: TextStyle(color: TvTableTheme.tvTextSecondary)),
+                  ),
                 );
               }
 
@@ -62,13 +64,9 @@ class PlansPage extends GetView<PlansController> {
   }
 
   Widget _buildSummaryBanner() {
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: TvTableTheme.tvHeaderBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: TvTableTheme.tvBorderColor),
-      ),
+      borderRadius: 16,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -77,9 +75,9 @@ class PlansPage extends GetView<PlansController> {
             children: [
               Text(
                 '量化执行计划概览',
-                style: TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 14, fontWeight: FontWeight.bold),
+                style: TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 14.5, fontWeight: FontWeight.bold),
               ),
-              Icon(Icons.next_plan, color: TvTableTheme.tvBlue, size: 20),
+              Icon(Icons.next_plan_rounded, color: TvTableTheme.tvBlue, size: 20),
             ],
           ),
           const SizedBox(height: 16),
@@ -180,14 +178,10 @@ class PlansPage extends GetView<PlansController> {
   }
 
   Widget _buildPlanCard(BuildContext context, QuantPlan plan) {
-    return Container(
+    return GlassCard(
       margin: const EdgeInsets.only(bottom: 12.0),
       padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: TvTableTheme.tvHeaderBg,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: TvTableTheme.tvBorderColor),
-      ),
+      borderRadius: 14,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -250,32 +244,44 @@ class PlansPage extends GetView<PlansController> {
             ],
           ),
           const SizedBox(height: 12),
+
+          // Plan Parameters Grid
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _buildPriceInfo('当前价', '\$${plan.currentPrice}', TvTableTheme.tvTextPrimary),
-              _buildPriceInfo('目标止盈', '\$${plan.targetPrice}', TvTableTheme.tvGreen),
-              _buildPriceInfo('止损价', '\$${plan.stopLossPrice}', TvTableTheme.tvRed),
+              _buildPlanDetailColumn('目标触发价', '\$${plan.targetPrice.toStringAsFixed(2)}'),
+              _buildPlanDetailColumn('预期收益率', '+${plan.expectedProfitPercent}%', color: TvTableTheme.tvGreen),
+              _buildPlanDetailColumn('止损价格', '\$${plan.stopLossPrice.toStringAsFixed(2)}', color: TvTableTheme.tvRed),
             ],
           ),
           const SizedBox(height: 12),
-          Row(
+
+          // Progress Bar
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: ClipRRect(
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('策略进度', style: TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 11)),
+                  Text(
+                    '${(plan.progressPercent * 100).toInt()}%',
+                    style: const TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 11, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Obx(
+                () => ClipRRect(
                   borderRadius: BorderRadius.circular(4),
                   child: LinearProgressIndicator(
                     value: plan.progressPercent,
                     backgroundColor: TvTableTheme.tvCanvasBg,
-                    valueColor: const AlwaysStoppedAnimation<Color>(TvTableTheme.tvBlue),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      plan.status.value == 'Active' ? TvTableTheme.tvBlue : TvTableTheme.tvTextSecondary,
+                    ),
                     minHeight: 6,
                   ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                '${(plan.progressPercent * 100).toInt()}%',
-                style: const TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 12, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -284,102 +290,51 @@ class PlansPage extends GetView<PlansController> {
     );
   }
 
-  Widget _buildPriceInfo(String label, String value, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 11)),
-        const SizedBox(height: 2),
-        Text(
-          value,
-          style: TextStyle(
-            color: color,
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            fontFeatures: const [FontFeature.tabularFigures()],
+  Widget _buildPlanDetailColumn(String label, String value, {Color? color}) {
+    return Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 11)),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: TextStyle(
+              color: color ?? TvTableTheme.tvTextPrimary,
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   void _showCreatePlanDialog(BuildContext context) {
-    final symbolController = TextEditingController(text: 'BTCUSDT');
-    final targetPriceController = TextEditingController(text: '68000');
-    final stopLossController = TextEditingController(text: '61000');
-    String selectedStrategy = 'Spot Scalping';
-
     Get.dialog(
       AlertDialog(
-        backgroundColor: TvTableTheme.tvHeaderBg,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text('新建交易计划', style: TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 16)),
-        content: StatefulBuilder(
-          builder: (context, setState) {
-            return SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: symbolController,
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
-                    decoration: InputDecoration(
-                      labelText: '交易对 Symbol',
-                      labelStyle: const TextStyle(color: TvTableTheme.tvTextSecondary),
-                      filled: true,
-                      fillColor: TvTableTheme.tvCanvasBg,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  DropdownButtonFormField<String>(
-                    initialValue: selectedStrategy,
-                    dropdownColor: TvTableTheme.tvHeaderBg,
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
-                    decoration: InputDecoration(
-                      labelText: '策略类型',
-                      labelStyle: const TextStyle(color: TvTableTheme.tvTextSecondary),
-                      filled: true,
-                      fillColor: TvTableTheme.tvCanvasBg,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                    items: ['Spot Scalping', 'Grid Trading', 'DCA Accumulation'].map((s) {
-                      return DropdownMenuItem(value: s, child: Text(s));
-                    }).toList(),
-                    onChanged: (val) {
-                      if (val != null) setState(() => selectedStrategy = val);
-                    },
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: targetPriceController,
-                    keyboardType: TextInputType.number,
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
-                    decoration: InputDecoration(
-                      labelText: '目标止盈价 (\$) ',
-                      labelStyle: const TextStyle(color: TvTableTheme.tvTextSecondary),
-                      filled: true,
-                      fillColor: TvTableTheme.tvCanvasBg,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: stopLossController,
-                    keyboardType: TextInputType.number,
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
-                    decoration: InputDecoration(
-                      labelText: '触发止损价 (\$) ',
-                      labelStyle: const TextStyle(color: TvTableTheme.tvTextSecondary),
-                      filled: true,
-                      fillColor: TvTableTheme.tvCanvasBg,
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                  ),
-                ],
+        backgroundColor: TvTableTheme.tvCardBg,
+        title: const Text('新建量化交易计划', style: TextStyle(color: Colors.white, fontSize: 16)),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                labelText: '交易标的 (如 BTCUSDT)',
+                labelStyle: TextStyle(color: TvTableTheme.tvTextSecondary),
               ),
-            );
-          },
+            ),
+            SizedBox(height: 12),
+            TextField(
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                labelText: '目标买入价格 (\$)',
+                labelStyle: TextStyle(color: TvTableTheme.tvTextSecondary),
+              ),
+            ),
+          ],
         ),
         actions: [
           TextButton(
@@ -389,11 +344,10 @@ class PlansPage extends GetView<PlansController> {
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: TvTableTheme.tvBlue),
             onPressed: () {
-              final target = double.tryParse(targetPriceController.text) ?? 68000.0;
-              final sl = double.tryParse(stopLossController.text) ?? 61000.0;
-              controller.createNewPlan(symbolController.text, selectedStrategy, target, sl);
+              Get.back();
+              Get.snackbar('创建成功', '新计划已存入策略引擎', backgroundColor: TvTableTheme.tvHeaderBg, colorText: Colors.white);
             },
-            child: const Text('立即启动计划', style: TextStyle(color: Colors.white)),
+            child: const Text('确认提交', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

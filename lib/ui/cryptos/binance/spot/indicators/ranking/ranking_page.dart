@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:taoniu/models/cryptos/binance/spot/spot_ticker.dart';
 import 'package:taoniu/routes/app_routes.dart';
 import 'package:taoniu/ui/components/pulsing_badge.dart';
 import 'package:taoniu/ui/components/tables/tradingview_table_theme.dart';
@@ -110,6 +111,8 @@ class IndicatorsRankingPage extends GetView<IndicatorsRankingController> {
         return 'R/R RATIO';
       case 'take_profit_ratio':
         return 'TP RATIO';
+      case 'change':
+        return 'CHANGE%';
       default:
         return field.replaceAll('_', ' ').toUpperCase();
     }
@@ -146,7 +149,31 @@ class IndicatorsRankingPage extends GetView<IndicatorsRankingController> {
     Color textColor = TvTableTheme.tvTextSecondary;
     String displayVal = rawVal;
 
-    if (field.contains('ratio')) {
+    if (field == 'change' || field.contains('change')) {
+      // Ranking API returns change as a decimal ratio (e.g. 0.0245 = 2.45%),
+      // convert to percentage scale (* 100) to align with Realtime Tickers.
+      final changePercent = numVal.abs() <= 1.0 ? numVal * 100 : numVal;
+      final normVal = SpotTicker.normalizeChangePercent(changePercent);
+      final isPositive = normVal > 0;
+      final isZero = normVal.abs() < 0.0001;
+      final Color textColor = isZero
+          ? TvTableTheme.tvTextSecondary
+          : isPositive
+              ? TvTableTheme.tvGreen
+              : TvTableTheme.tvRed;
+      final sign = isPositive ? '+' : '';
+      final displayStr = '$sign${normVal.toStringAsFixed(2)}%';
+
+      return Text(
+        displayStr,
+        style: TextStyle(
+          color: textColor,
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          fontFeatures: const [FontFeature.tabularFigures()],
+        ),
+      );
+    } else if (field.contains('ratio')) {
       displayVal = numVal.toStringAsFixed(2);
       if (numVal > 0) {
         textColor = TvTableTheme.tvGreen;
@@ -599,6 +626,19 @@ class IndicatorsRankingPage extends GetView<IndicatorsRankingController> {
               },
             ),
             ListTile(
+              leading: const Icon(Icons.candlestick_chart_rounded, color: TvTableTheme.tvGreen),
+              title: const Text('查看 TradingView K 线图表', style: TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 13.5)),
+              onTap: () {
+                Get.back();
+                Get.toNamed(
+                  AppRoutes.binanceSpotTradings,
+                  arguments: {
+                    'symbol': symbol,
+                  },
+                );
+              },
+            ),
+            ListTile(
               leading: const Icon(Icons.copy_rounded, color: TvTableTheme.tvAmber),
               title: const Text('复制 Symbol 名称', style: TextStyle(color: TvTableTheme.tvTextPrimary, fontSize: 13.5)),
               onTap: () {
@@ -654,10 +694,30 @@ class IndicatorsRankingPage extends GetView<IndicatorsRankingController> {
                     }
 
                     if (data.isEmpty) {
-                      return const Center(
-                        child: Text(
-                          '暂无匹配指标数据',
-                          style: TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 14),
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.search_off_rounded, color: TvTableTheme.tvTextSecondary, size: 40),
+                            const SizedBox(height: 8),
+                            const Text(
+                              '暂无匹配指标数据',
+                              style: TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 13.5),
+                            ),
+                            if (controller.searchQuery.value.isNotEmpty) ...[
+                              const SizedBox(height: 12),
+                              OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: TvTableTheme.tvBlue, width: 0.8),
+                                  foregroundColor: TvTableTheme.tvBlue,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                ),
+                                icon: const Icon(Icons.clear, size: 14),
+                                label: const Text('清除搜索条件', style: TextStyle(fontSize: 12)),
+                                onPressed: () => controller.clearSearch(),
+                              ),
+                            ],
+                          ],
                         ),
                       );
                     }
@@ -665,7 +725,7 @@ class IndicatorsRankingPage extends GetView<IndicatorsRankingController> {
                     return RefreshIndicator(
                       color: TvTableTheme.tvBlue,
                       backgroundColor: TvTableTheme.tvHeaderBg,
-                      onRefresh: () async => controller.fetchRanking(),
+                      onRefresh: () async => controller.refreshData(),
                       child: _buildRankingTable(context, data),
                     );
                   });

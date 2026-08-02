@@ -32,6 +32,10 @@ class IndicatorsRankingController extends GetxController {
   final sortFieldIndex = 5.obs; // Default to poc_ratio
   final sortAscending = false.obs;
 
+  void clearSearch() {
+    searchQuery.value = '';
+  }
+
   @override
   void onInit() {
     super.onInit();
@@ -135,7 +139,14 @@ class IndicatorsRankingController extends GetxController {
     } catch (_) {}
   }
 
-  void fetchRanking() async {
+  Future<void> refreshData() async {
+    await Future.wait([
+      fetchRanking(),
+      fetchBtc1dMetrics(),
+    ]);
+  }
+
+  Future<void> fetchRanking() async {
     final currentIntv = selectedInterval.value;
     try {
       if (!rankingData.containsKey(currentIntv)) {

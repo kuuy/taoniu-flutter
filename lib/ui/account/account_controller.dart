@@ -25,6 +25,11 @@ class AccountController extends GetxController {
   final binanceSecretKey = ''.obs;
   final isApiKeyVisible = false.obs;
 
+  // System Settings
+  final enableNotifications = true.obs;
+
+  bool get isApiKeyBound => binanceApiKey.value.isNotEmpty;
+
   @override
   void onInit() {
     super.onInit();
@@ -98,8 +103,7 @@ class AccountController extends GetxController {
 
     if (confirm == true) {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.remove('ACCESS_TOKEN');
-      await prefs.remove('REFRESH_TOKEN');
+      await prefs.remove('AUTH_TOKEN');
       Get.offAllNamed(AppRoutes.login);
     }
   }

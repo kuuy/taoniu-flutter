@@ -1,7 +1,12 @@
+import 'dart:async';
 import 'package:get/get.dart';
 import 'package:taoniu/api/cryptos/binance/spot/tickers/ranking_api.dart';
+import 'package:taoniu/services/binance_spot_ws_service.dart';
 
 class TickersRankingController extends GetxController {
+  final BinanceSpotWsService wsService = BinanceSpotWsService();
+  StreamSubscription? _messageSub;
+
   final items = <String>[].obs;
   final isLoading = true.obs;
   final searchQuery = ''.obs;
@@ -25,6 +30,48 @@ class TickersRankingController extends GetxController {
   void onInit() {
     super.onInit();
     fetchRanking();
+    _listenWs();
+  }
+
+  @override
+  void onClose() {
+    _messageSub?.cancel();
+    wsService.dispose();
+    super.onClose();
+  }
+
+  void _listenWs() {
+    _messageSub?.cancel();
+    _messageSub = wsService.messageStream.listen((data) {
+      _handleWsMessage(data);
+    });
+  }
+
+  void _handleWsMessage(Map<String, dynamic> data) {
+    final sym = (data['symbol'] ?? data['s'] ?? data['sym'] ?? data['name'])?.toString().toUpperCase();
+    if (sym == null || sym.isEmpty) return;
+
+    final pStr = (data['price'] ?? data['p'] ?? data['close'] ?? data['c'])?.toString();
+    final cStr = (data['change'] ?? data['P'] ?? data['percent'])?.toString();
+
+    if (pStr == null && cStr == null) return;
+
+    final list = items.toList();
+    bool updated = false;
+    for (int i = 0; i < list.length; i++) {
+      final parts = list[i].split(',');
+      if (parts.isNotEmpty && parts[0].trim().toUpperCase() == sym) {
+        // parts[1] is price, parts[7] or parts[6] is change
+        if (pStr != null && parts.length > 1) parts[1] = pStr;
+        if (cStr != null && parts.length > 7) parts[7] = cStr;
+        list[i] = parts.join(',');
+        updated = true;
+        break;
+      }
+    }
+    if (updated) {
+      items.assignAll(list);
+    }
   }
 
   void toggleSort(int fieldIndex) {
@@ -76,6 +123,10 @@ class TickersRankingController extends GetxController {
         pageSize: 200,
       );
       items.value = response.data ?? [];
+      final fetchedSymbols = items.map((item) => item.split(',').first.trim().toUpperCase()).where((s) => s.isNotEmpty).toList();
+      if (fetchedSymbols.isNotEmpty) {
+        wsService.subscribe(fetchedSymbols.take(50).toList());
+      }
     } catch (e) {
       if (Get.context != null) {
         Get.snackbar('获取行情排行榜失败', e.toString());

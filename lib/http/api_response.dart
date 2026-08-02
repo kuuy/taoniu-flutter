@@ -14,11 +14,19 @@ class ApiResponse<T> {
   bool get isSuccess => success && error == null;
 
   factory ApiResponse.fromJson(Map<String, dynamic> json, T Function(dynamic) fromJsonT) {
+    T? parsedData;
+    if (json['data'] != null) {
+      try {
+        parsedData = fromJsonT(json['data']);
+      } catch (_) {
+        parsedData = null;
+      }
+    }
     return ApiResponse(
       success: json['success'] ?? false,
       error: json['error']?.toString(),
       code: json['code'] is int ? json['code'] : null,
-      data: json['data'] != null ? fromJsonT(json['data']) : null,
+      data: parsedData,
     );
   }
 
@@ -51,10 +59,16 @@ class PaginateResponse<T> {
   bool get isSuccess => success && error == null;
 
   factory PaginateResponse.fromJson(Map<String, dynamic> json, T Function(dynamic) fromJsonT) {
-    var dataList = json['data'] as List?;
+    final rawData = json['data'];
     List<T>? mappedData;
-    if (dataList != null) {
-      mappedData = dataList.map((e) => fromJsonT(e)).toList();
+    if (rawData is List) {
+      mappedData = rawData.map((e) {
+        try {
+          return fromJsonT(e);
+        } catch (_) {
+          return null;
+        }
+      }).whereType<T>().toList();
     }
 
     return PaginateResponse(

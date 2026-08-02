@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../components/tables/tradingview_table_theme.dart';
+import '../components/mini_sparkline.dart';
 import 'markets_controller.dart';
 
 class MarketsPage extends GetView<MarketsController> {
@@ -55,7 +56,7 @@ class MarketsPage extends GetView<MarketsController> {
               }
 
               return ListView.separated(
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: 4),
                 itemCount: list.length,
                 separatorBuilder: (context, index) => const Divider(height: 1, color: TvTableTheme.tvBorderColor),
                 itemBuilder: (context, index) {
@@ -77,7 +78,7 @@ class MarketsPage extends GetView<MarketsController> {
       child: TextField(
         style: const TextStyle(color: Colors.white, fontSize: 13),
         decoration: InputDecoration(
-          hintText: '搜索标的 / 币种 (BTC, ETH...)',
+          hintText: '搜索标的 / 币种 (BTC, ETH, SOL...)',
           hintStyle: const TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 13),
           prefixIcon: const Icon(Icons.search, color: TvTableTheme.tvTextSecondary, size: 18),
           filled: true,
@@ -145,16 +146,24 @@ class MarketsPage extends GetView<MarketsController> {
     final pnlColor = isPositive ? TvTableTheme.tvGreen : TvTableTheme.tvRed;
     final sign = isPositive ? '+' : '';
 
+    // Mock trend line generator for sparkline
+    final List<double> sparkData = isPositive
+        ? [item.price * 0.96, item.price * 0.97, item.price * 0.965, item.price * 0.99, item.price]
+        : [item.price * 1.04, item.price * 1.03, item.price * 1.035, item.price * 1.01, item.price];
+
     return InkWell(
       onTap: () => controller.openTradingChart(item),
+      splashColor: TvTableTheme.tvBlue.withValues(alpha: 0.1),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         color: TvTableTheme.tvCanvasBg,
         child: Row(
           children: [
             // Favorite Toggle Icon
             Obx(
               () => IconButton(
+                constraints: const BoxConstraints(maxWidth: 32),
+                padding: EdgeInsets.zero,
                 icon: Icon(
                   item.isFavorite.value ? Icons.star : Icons.star_border,
                   color: item.isFavorite.value ? Colors.amber : TvTableTheme.tvTextSecondary,
@@ -163,10 +172,11 @@ class MarketsPage extends GetView<MarketsController> {
                 onPressed: () => controller.toggleFavorite(item),
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 8),
 
             // Base Asset / Quote Asset
             Expanded(
+              flex: 3,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -191,7 +201,7 @@ class MarketsPage extends GetView<MarketsController> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Vol ${item.volume24h}',
+                    '24h Vol ${item.volume24h}',
                     style: TextStyle(
                       color: TvTableTheme.tvTextSecondary.withValues(alpha: 0.7),
                       fontSize: 11,
@@ -201,37 +211,53 @@ class MarketsPage extends GetView<MarketsController> {
               ),
             ),
 
-            // Price & 24h PnL Badge
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '\$${item.price < 1 ? item.price.toStringAsFixed(4) : item.price.toStringAsFixed(2)}',
-                  style: const TextStyle(
-                    color: TvTableTheme.tvTextPrimary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    fontFeatures: [FontFeature.tabularFigures()],
-                  ),
+            // Sparkline Graph
+            Expanded(
+              flex: 2,
+              child: Center(
+                child: MiniSparkline(
+                  data: sparkData,
+                  color: pnlColor,
+                  width: 55,
+                  height: 24,
                 ),
-                const SizedBox(height: 4),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: pnlColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(color: pnlColor.withValues(alpha: 0.3), width: 0.8),
-                  ),
-                  child: Text(
-                    '$sign${item.change24h.toStringAsFixed(2)}%',
-                    style: TextStyle(
-                      color: pnlColor,
-                      fontSize: 12,
+              ),
+            ),
+
+            // Price & 24h PnL Badge
+            Expanded(
+              flex: 3,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    '\$${item.price < 1 ? item.price.toStringAsFixed(4) : item.price.toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      color: TvTableTheme.tvTextPrimary,
+                      fontSize: 14.5,
                       fontWeight: FontWeight.bold,
+                      fontFeatures: [FontFeature.tabularFigures()],
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: pnlColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: pnlColor.withValues(alpha: 0.3), width: 0.8),
+                    ),
+                    child: Text(
+                      '$sign${item.change24h.toStringAsFixed(2)}%',
+                      style: TextStyle(
+                        color: pnlColor,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),

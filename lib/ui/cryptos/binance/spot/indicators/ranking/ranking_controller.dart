@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:taoniu/api/cryptos/binance/spot/indicators_api.dart';
 import 'package:taoniu/api/cryptos/binance/spot/indicators/ranking_api.dart';
 
 class IndicatorsRankingController extends GetxController {
@@ -7,6 +8,9 @@ class IndicatorsRankingController extends GetxController {
   var isLoading = true.obs;
   var selectedInterval = '1m'.obs;
   final rankingData = <String, List<String>>{}.obs;
+
+  var btcAhr999 = RxnDouble();
+  var btcMvrv = RxnDouble();
 
   final intervals = ['1m', '15m', '4h', '1d'];
   late PageController pageController;
@@ -34,6 +38,7 @@ class IndicatorsRankingController extends GetxController {
     final initialIndex = intervals.indexOf(selectedInterval.value);
     pageController = PageController(initialPage: initialIndex >= 0 ? initialIndex : 0);
     fetchRanking();
+    fetchBtc1dMetrics();
   }
 
   @override
@@ -94,6 +99,9 @@ class IndicatorsRankingController extends GetxController {
       );
     }
     fetchRanking();
+    if (interval == '1d') {
+      fetchBtc1dMetrics();
+    }
   }
 
   void onPageChanged(int index) {
@@ -102,7 +110,29 @@ class IndicatorsRankingController extends GetxController {
     if (selectedInterval.value != interval) {
       selectedInterval.value = interval;
       fetchRanking();
+      if (interval == '1d') {
+        fetchBtc1dMetrics();
+      }
     }
+  }
+
+  var btcPrice = RxnDouble();
+
+  Future<void> fetchBtc1dMetrics() async {
+    try {
+      final response = await IndicatorsApi.gets(
+        symbols: "BTCUSDT",
+        interval: "1d",
+        fields: "ahr999,mvrv",
+      );
+      if (response.success && response.data != null && response.data!.isNotEmpty) {
+        final parts = response.data![0].split(',');
+        // response.data[0] format: "ahr999_val,price,timestamp,mvrv_val,price,timestamp"
+        if (parts.isNotEmpty) btcAhr999.value = double.tryParse(parts[0]);
+        if (parts.length > 1) btcPrice.value = double.tryParse(parts[1]);
+        if (parts.length > 3) btcMvrv.value = double.tryParse(parts[3]);
+      }
+    } catch (_) {}
   }
 
   void fetchRanking() async {
@@ -128,3 +158,4 @@ class IndicatorsRankingController extends GetxController {
     }
   }
 }
+

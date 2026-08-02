@@ -3,8 +3,87 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:taoniu/routes/app_routes.dart';
+import 'package:taoniu/ui/components/pulsing_badge.dart';
 import 'package:taoniu/ui/components/tables/tradingview_table_theme.dart';
 import 'ranking_controller.dart';
+
+class IndicatorSignalInfo {
+  final String label;
+  final Color color;
+  final String zone;
+
+  const IndicatorSignalInfo({
+    required this.label,
+    required this.color,
+    required this.zone,
+  });
+
+  static IndicatorSignalInfo evaluateAhr999(double? val) {
+    if (val == null) return const IndicatorSignalInfo(label: '未获取', color: TvTableTheme.tvTextSecondary, zone: '数据未就绪');
+    if (val < 0.45) return const IndicatorSignalInfo(label: '抄底买入', color: TvTableTheme.tvGreen, zone: '抄底区间 (< 0.45)');
+    if (val < 1.2) return const IndicatorSignalInfo(label: '定投建仓', color: TvTableTheme.tvCyan, zone: '定投区间 (0.45 ~ 1.2)');
+    if (val < 5.0) return const IndicatorSignalInfo(label: '牛市持仓', color: TvTableTheme.tvAmber, zone: '牛市区间 (1.2 ~ 5.0)');
+    return const IndicatorSignalInfo(label: '狂热止盈', color: TvTableTheme.tvRed, zone: '逃顶区间 (>= 5.0)');
+  }
+
+  static IndicatorSignalInfo evaluateMvrv(double? val) {
+    if (val == null) return const IndicatorSignalInfo(label: '未获取', color: TvTableTheme.tvTextSecondary, zone: '数据未就绪');
+    if (val < 1.0) return const IndicatorSignalInfo(label: '极度低估', color: TvTableTheme.tvGreen, zone: '探底区 (< 1.0)');
+    if (val < 2.0) return const IndicatorSignalInfo(label: '温和蓄势', color: TvTableTheme.tvCyan, zone: '积累区 (1.0 ~ 2.0)');
+    if (val < 3.5) return const IndicatorSignalInfo(label: '阶段偏高', color: TvTableTheme.tvAmber, zone: '减仓区 (2.0 ~ 3.5)');
+    return const IndicatorSignalInfo(label: '极度过热', color: TvTableTheme.tvRed, zone: '顶部狂热 (>= 3.5)');
+  }
+
+  static ({String title, String desc, Color color, String badge}) evaluateCombined(double? ahr, double? mv) {
+    if (ahr == null && mv == null) {
+      return (
+        title: 'BTC 1D 多空指标加载中',
+        desc: '通过 IndicatorsApi 获取 BTCUSDT 1d 周期 ahr999 及 mvrv...',
+        color: TvTableTheme.tvTextSecondary,
+        badge: 'LOADING',
+      );
+    }
+    final a = ahr ?? 1.0;
+    final m = mv ?? 1.5;
+
+    if (a < 0.45 && m < 1.0) {
+      return (
+        title: '强力做多 / 黄金抄底区',
+        desc: 'BTC 1d ahr999与MVRV均处于历史极度低估区间，极高盈亏比抄底/做多窗口',
+        color: TvTableTheme.tvGreen,
+        badge: 'STRONG LONG',
+      );
+    } else if (a < 1.2 && m < 2.0) {
+      return (
+        title: '定投建仓 / 多头蓄势区',
+        desc: '指标处于筹码估值合理区间，适合逢低分批定投建仓或持有多单',
+        color: TvTableTheme.tvCyan,
+        badge: 'DCA / BUY',
+      );
+    } else if (a >= 5.0 || m >= 3.5) {
+      return (
+        title: '极度狂热 / 强烈看空止盈',
+        desc: '市场进入牛市顶部过热高风险区，建议分批平多止盈或对冲做空',
+        color: TvTableTheme.tvRed,
+        badge: 'STRONG SHORT',
+      );
+    } else if (m >= 2.5 || a >= 2.0) {
+      return (
+        title: '阶段高位 / 防守避险',
+        desc: '市场筹码获利盘较高，建议上移止损防守，警惕回调风险',
+        color: TvTableTheme.tvAmber,
+        badge: 'NEUTRAL / DEFENSE',
+      );
+    } else {
+      return (
+        title: '中性持仓 / 趋势跟踪',
+        desc: '指标处于常态市场区间，保持原有策略，顺应趋势交易',
+        color: TvTableTheme.tvBlue,
+        badge: 'HOLD / NEUTRAL',
+      );
+    }
+  }
+}
 
 class IndicatorsRankingPage extends GetView<IndicatorsRankingController> {
   const IndicatorsRankingPage({super.key});
@@ -93,6 +172,166 @@ class IndicatorsRankingPage extends GetView<IndicatorsRankingController> {
         fontFeatures: const [FontFeature.tabularFigures()],
       ),
     );
+  }
+
+  Widget _buildBtc1dCard(BuildContext context) {
+    return Obx(() {
+      if (controller.selectedInterval.value != '1d') {
+        return const SizedBox.shrink();
+      }
+
+      final ahr999 = controller.btcAhr999.value;
+      final mvrv = controller.btcMvrv.value;
+      final price = controller.btcPrice.value;
+
+      final ahrInfo = IndicatorSignalInfo.evaluateAhr999(ahr999);
+      final mvrvInfo = IndicatorSignalInfo.evaluateMvrv(mvrv);
+      final combined = IndicatorSignalInfo.evaluateCombined(ahr999, mvrv);
+
+      final priceText = price != null ? ' (现价 $price)' : '';
+
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: TvTableTheme.tvHeaderBg,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: TvTableTheme.tvBorderColor, width: 0.8),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.15),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.analytics_rounded, color: TvTableTheme.tvBlue, size: 18),
+                    const SizedBox(width: 6),
+                    Text(
+                      'BTCUSDT 1D 指标多空信号$priceText',
+                      style: const TextStyle(
+                        color: TvTableTheme.tvTextPrimary,
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                PulsingBadge(
+                  label: combined.badge,
+                  color: combined.color,
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              decoration: BoxDecoration(
+                color: combined.color.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: combined.color.withValues(alpha: 0.25), width: 0.8),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.bolt_rounded, color: combined.color, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          combined.title,
+                          style: TextStyle(
+                            color: combined.color,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          combined.desc,
+                          style: const TextStyle(
+                            color: TvTableTheme.tvTextSecondary,
+                            fontSize: 11.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: TvTableTheme.tvCanvasBg,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'ahr999',
+                          style: TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 11.5),
+                        ),
+                        Text(
+                          ahr999 != null ? '${ahr999.toStringAsFixed(ahr999.abs() >= 10 ? 2 : 4)} (${ahrInfo.label})' : '未获取',
+                          style: TextStyle(
+                            color: ahrInfo.color,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: TvTableTheme.tvCanvasBg,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'mvrv',
+                          style: TextStyle(color: TvTableTheme.tvTextSecondary, fontSize: 11.5),
+                        ),
+                        Text(
+                          mvrv != null ? '${mvrv.toStringAsFixed(mvrv.abs() >= 10 ? 2 : 4)} (${mvrvInfo.label})' : '未获取',
+                          style: TextStyle(
+                            color: mvrvInfo.color,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildSearchBar() {
@@ -382,6 +621,7 @@ class IndicatorsRankingPage extends GetView<IndicatorsRankingController> {
       body: Column(
         children: [
           _buildSearchBar(),
+          _buildBtc1dCard(context),
           const Divider(height: 1, color: TvTableTheme.tvBorderColor),
           Expanded(
             child: ScrollConfiguration(
@@ -438,3 +678,4 @@ class IndicatorsRankingPage extends GetView<IndicatorsRankingController> {
     );
   }
 }
+
